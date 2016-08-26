@@ -27,12 +27,12 @@ This is a boilerplate for scaffolding MERN stack projects with livereload featur
   - i18n
   - Upload avatar
   - Ajax progress bar
+- React Native
 
 ## Installation
 
 ```
 npm install -g gulp
-npm install -g jscs
 npm install
 ```
 
@@ -150,6 +150,42 @@ gulp deploy [--app=<heroku_app_name>] [--create]
 - `-c`, `--create`
 
   If you want to create new app on heroku, please use this switch.
+
+## React Native
+
+For development, just use:
+
+```bash
+npm run android
+```
+
+For production or distributing APK, please refer to the setup part of [Generating Signed APK](https://facebook.github.io/react-native/docs/signed-apk-android.html). You can use helper scripts below:
+
+```bash
+npm run android-keygen
+npm run release-android
+npm run install-android
+```
+
+## Setup a new project
+
+``` bash
+cd <your_project>
+git flow init -d
+git remote add -t master mirror https://github.com/gocreating/express-react-hmr-boilerplate.git
+git fetch mirror master:mirror # git fetch <remote> <rbranch>:<lbranch>
+
+git flow feature start mirror
+git merge --no-ff --no-edit mirror
+git flow feature finish mirror
+
+# git flow feature start tune-mirror
+# tune the boilerplate to suit your own project
+# git flow feature finish tune-mirror
+
+git remote add origin <your_project.git>
+git push -u origin master
+```
 
 ## Roadmap
 
