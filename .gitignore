@@ -1,0 +1,24 @@
+# Dependency directory
+node_modules
+
+# Secret
+*.pub
+*.pem
+*.ppk
+configs/**/credential.*
+
+# Log
+*.log
+
+# Generated files
+/build
+/.deploy
+/src/public/uploads
+/src/public/user
+
+# webpack-isomorphic-tools
+webpack-stats.json
+webpack-assets.json
+
+# Others
+.DS_Store
