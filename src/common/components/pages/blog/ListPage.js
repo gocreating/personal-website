@@ -2,13 +2,10 @@ import React from 'react';
 import PageLayout from '../../layouts/PageLayout';
 import PageHeader from '../../main/PageHeader';
 
-const HomePage = (props) => (
+const ListPage = (props) => (
   <PageLayout>
-    <PageHeader title="Go Creating" />
-    <p>
-      Go Creating
-    </p>
+    <PageHeader title="部落格" />
   </PageLayout>
 );
 
-export default HomePage;
+export default ListPage;

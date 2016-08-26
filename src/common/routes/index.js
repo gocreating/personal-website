@@ -8,8 +8,8 @@ export default (store) => ({
   getChildRoutes(location, cb) {
     require.ensure([], (require) => {
       cb(null, [
-        require('./user').default(store),
-        require('./todo').default(store),
+        require('./blog').default(store),
+        require('./resume').default(store),
         require('./notFound').default(store),
       ]);
     });

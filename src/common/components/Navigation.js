@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router';
 import Navbar from './main/Navbar';
 import Container from './main/Container';
 import NavLink from './NavLink';
@@ -19,29 +18,19 @@ class Navigation extends Component {
   }
 
   render() {
-    let { token, user } = this.props.cookie;
-    let isAuth = !!token;
-    user = (user && JSON.parse(user)) || {};
-
     return (
       <Navbar staticTop>
         <Container>
-          <Navbar.Header>
-            <Link className="navbar-brand" to="/" >
-              Logo
-            </Link>
-          </Navbar.Header>
-
           <Navbar.Body>
             <Navbar.Nav>
               <NavLink to="/" onlyActiveOnIndex>
-                <Text id="nav.home" />
+                Go Creating
               </NavLink>
-              <NavLink to="/todo">
-                <Text id="nav.todo" />
+              <NavLink to="/blog">
+                部落格
               </NavLink>
-              <NavLink to="/does/not/exist">
-                404
+              <NavLink to="/resume">
+                履歷
               </NavLink>
             </Navbar.Nav>
 
@@ -55,33 +44,6 @@ class Navigation extends Component {
                   title="繁體中文"
                   onClick={this._setLanguage.bind(this, 'zh-tw')}
                 />
-                <MenuItem
-                  title="Not supported"
-                  onClick={this._setLanguage.bind(this, 'foo-bar')}
-                />
-              </Navbar.Dropdown>
-              <Navbar.Dropdown
-                title={
-                  !isAuth ?
-                  <Text id="nav.user" /> :
-                  (user.name || user.email)}
-              >
-                {!isAuth &&
-                  <NavLink to="/user/login">
-                    <Text id="nav.user.login" />
-                  </NavLink>}
-                {!isAuth &&
-                  <NavLink to="/user/register">
-                    <Text id="nav.user.register" />
-                  </NavLink>}
-                {isAuth &&
-                  <NavLink to="/user/me">
-                    <Text id="nav.user.profile" />
-                  </NavLink>}
-                {isAuth &&
-                  <NavLink to="/user/logout">
-                    <Text id="nav.user.logout" />
-                  </NavLink>}
               </Navbar.Dropdown>
             </Navbar.Nav>
           </Navbar.Body>

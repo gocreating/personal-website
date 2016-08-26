@@ -6,7 +6,7 @@ import Navigation from '../Navigation';
 const AppLayout = ({ cookie, children }) => (
   <div>
     <Head
-      title="Express-React-HMR-Boilerplate"
+      title="Go Creating"
       metas={[
         {charset: 'utf-8'},
         {
@@ -15,10 +15,7 @@ const AppLayout = ({ cookie, children }) => (
         },
       ]}
       links={[
-        // jscs:disable
-        'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css',
         '/css/main.css',
-        // jscs:enable
       ]}
       scripts={[
         // jscs:disable

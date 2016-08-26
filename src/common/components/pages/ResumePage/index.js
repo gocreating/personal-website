@@ -2,13 +2,10 @@ import React from 'react';
 import PageLayout from '../../layouts/PageLayout';
 import PageHeader from '../../main/PageHeader';
 
-const HomePage = (props) => (
+const ResumePage = (props) => (
   <PageLayout>
-    <PageHeader title="Go Creating" />
-    <p>
-      Go Creating
-    </p>
+    <PageHeader title="履歷" />
   </PageLayout>
 );
 
-export default HomePage;
+export default ResumePage;
