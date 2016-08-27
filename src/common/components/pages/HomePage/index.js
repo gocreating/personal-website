@@ -1,13 +1,19 @@
 import React from 'react';
 import PageLayout from '../../layouts/PageLayout';
-import PageHeader from '../../main/PageHeader';
+import Container from '../../main/Container';
 
 const HomePage = (props) => (
   <PageLayout>
-    <PageHeader title="Go Creating" />
-    <p>
-      Go Creating
-    </p>
+    <section>
+      <Container>
+        <div className="row">
+          <div className="col-lg-12">
+            <h1>Go Creating</h1>
+            <p>去創造吧！</p>
+          </div>
+        </div>
+      </Container>
+    </section>
   </PageLayout>
 );
 

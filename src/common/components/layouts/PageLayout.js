@@ -1,10 +1,13 @@
 import React from 'react';
-import Container from '../main/Container';
+import Navigation from '../Navigation';
+import Footer from '../Footer';
 
 const PageLayout = ({ children, ...rest }) => (
-  <Container {...rest}>
+  <div>
+    <Navigation />
     {children}
-  </Container>
+    <Footer />
+  </div>
 );
 
 export default PageLayout;
