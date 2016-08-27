@@ -31,6 +31,11 @@ h6 {
   text-transform: uppercase;
   font-weight: 700;
 }
+blockquote {
+  font-style: italic;
+  margin-top: 30px;
+  padding: 20px 0 20px 30px;
+}
 hr.star-light,
 hr.star-primary {
   padding: 0;
@@ -66,42 +71,6 @@ hr.star-primary:after {
 }
 .img-centered {
   margin: 0 auto;
-}
-header {
-  text-align: center;
-  background: #18BC9C;
-  color: white;
-}
-header .container {
-  padding-top: 100px;
-  padding-bottom: 50px;
-}
-header img {
-  display: block;
-  margin: 0 auto 20px;
-}
-header .intro-text .name {
-  display: block;
-  font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: 2em;
-}
-header .intro-text .skills {
-  font-size: 1.25em;
-  font-weight: 300;
-}
-@media (min-width: 768px) {
-  header .container {
-    padding-top: 200px;
-    padding-bottom: 100px;
-  }
-  header .intro-text .name {
-    font-size: 4.75em;
-  }
-  header .intro-text .skills {
-    font-size: 1.75em;
-  }
 }
 .navbar-custom {
   background: #2C3E50;
@@ -191,22 +160,35 @@ header .intro-text .skills {
   }
 }
 section {
+  background: white;
   padding: 100px 0;
 }
-section h2 {
-  margin: 0;
-  font-size: 3em;
+section img {
+  display: block;
+  margin: 0 auto 20px;
+}
+section p {
+  padding: 30px 0 0 0;
+}
+section li {
+  font-size: 20px;
 }
 section.success {
   background: #18BC9C;
   color: white;
 }
+section.primary {
+  background: #2C3E50;
+  color: white;
+}
+section.success a,
+section.primary a {
+  color: white;
+  text-decoration: underline;
+}
 @media (max-width: 767px) {
   section {
     padding: 75px 0;
-  }
-  section.first {
-    padding-top: 75px;
   }
 }
 #portfolio .portfolio-item {
