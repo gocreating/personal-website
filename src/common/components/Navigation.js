@@ -19,13 +19,23 @@ class Navigation extends Component {
 
   render() {
     return (
-      <Navbar staticTop>
+      <Navbar staticTop className="navbar-custom">
         <Container>
-          <Navbar.Body>
+          <div className="navbar-header page-scroll">
+            <button
+              type="button"
+              className="navbar-toggle"
+              data-toggle="collapse"
+              data-target="#navbar-collapse"
+            >
+              <span className="sr-only">Toggle navigation</span>
+              Menu <i className="fa fa-bars"></i>
+            </button>
+            <a className="navbar-brand" href="/">Go Creating</a>
+          </div>
+
+          <Navbar.Body id="navbar-collapse">
             <Navbar.Nav>
-              <NavLink to="/" onlyActiveOnIndex>
-                Go Creating
-              </NavLink>
               <NavLink to="/blog">
                 部落格
               </NavLink>
@@ -33,7 +43,6 @@ class Navigation extends Component {
                 履歷
               </NavLink>
             </Navbar.Nav>
-
             <Navbar.Nav right>
               <Navbar.Dropdown title={<Text id="nav.language" />}>
                 <MenuItem

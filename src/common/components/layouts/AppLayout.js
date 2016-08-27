@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Head from '../Head';
-import Navigation from '../Navigation';
 
 const AppLayout = ({ cookie, children }) => (
   <div>
@@ -15,15 +14,12 @@ const AppLayout = ({ cookie, children }) => (
         },
       ]}
       links={[
-        '/css/main.css',
+        'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css',
       ]}
       scripts={[
-        // jscs:disable
         'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js',
-        // jscs:enable
       ]}
     />
-    <Navigation cookie={cookie} />
     {children}
   </div>
 );
