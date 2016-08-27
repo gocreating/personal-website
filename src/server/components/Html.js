@@ -17,6 +17,11 @@ const Html = ({ assets, children, initialState }) => (
         type="text/css"
         href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
       />
+      <link
+        rel="stylesheet"
+        type="text/css"
+        href="/css/theme.css"
+      />
       <script
         src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"
       />
