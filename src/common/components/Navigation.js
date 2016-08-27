@@ -31,16 +31,18 @@ class Navigation extends Component {
               <span className="sr-only">Toggle navigation</span>
               Menu <i className="fa fa-bars"></i>
             </button>
-            <a className="navbar-brand" href="/">Go Creating</a>
+            <a className="navbar-brand" href="/">
+              <Text id="nav.brand" />
+            </a>
           </div>
 
           <Navbar.Body id="navbar-collapse">
             <Navbar.Nav>
               <NavLink to="/blog">
-                部落格
+                <Text id="nav.blog" />
               </NavLink>
               <NavLink to="/resume">
-                履歷
+                <Text id="nav.resume" />
               </NavLink>
             </Navbar.Nav>
             <Navbar.Nav right>
