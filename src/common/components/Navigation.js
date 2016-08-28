@@ -63,6 +63,9 @@ class Navigation extends Component {
               </Navbar.Dropdown>
               {isAuth && (
                 <Navbar.Dropdown title={user.name || user.email}>
+                  <NavLink to="/blog/new">
+                    <Text id="nav.blog.new" />
+                  </NavLink>
                   <NavLink to="/user/logout">
                     <Text id="nav.user.logout" />
                   </NavLink>
