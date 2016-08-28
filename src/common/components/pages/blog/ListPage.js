@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import PageLayout from '../../layouts/PageLayout';
 import Container from '../../main/Container';
+import blogAPI from '../../../api/blog';
 
 class ListPage extends Component {
   constructor(props) {
@@ -9,6 +10,22 @@ class ListPage extends Component {
     this.state = {
       blogs: [],
     };
+  }
+
+  componentDidMount() {
+    if (!this.state.blogs.length) {
+      blogAPI(this.context.store.getState().apiEngine)
+        .list()
+        .catch((err) => {
+          alert('List blogs error');
+          throw err;
+        })
+        .then((json) => {
+          this.setState({
+            blogs: json.blogs,
+          });
+        });
+    }
   }
 
   render() {
