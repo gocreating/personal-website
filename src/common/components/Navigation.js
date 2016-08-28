@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Navbar from './main/Navbar';
 import Container from './main/Container';
 import NavLink from './NavLink';
@@ -18,6 +19,10 @@ class Navigation extends Component {
   }
 
   render() {
+    let { token, user } = this.props.cookie;
+    let isAuth = !!token;
+    user = (user && JSON.parse(user)) || {};
+
     return (
       <Navbar staticTop className="navbar-custom">
         <Container>
@@ -56,6 +61,13 @@ class Navigation extends Component {
                   onClick={this._setLanguage.bind(this, 'zh-tw')}
                 />
               </Navbar.Dropdown>
+              {isAuth && (
+                <Navbar.Dropdown title={user.name || user.email}>
+                  <NavLink to="/user/logout">
+                    <Text id="nav.user.logout" />
+                  </NavLink>
+                </Navbar.Dropdown>
+              )}
             </Navbar.Nav>
           </Navbar.Body>
         </Container>
@@ -68,4 +80,4 @@ Navigation.contextTypes = {
   store: React.PropTypes.object.isRequired,
 };
 
-export default Navigation;
+export default connect(state => state)(Navigation);

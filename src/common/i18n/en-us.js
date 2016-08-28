@@ -4,4 +4,5 @@ export default {
   'nav.blog': 'Blog',
   'nav.resume': 'Resume',
   'nav.language': 'Language',
+  'nav.user.logout': 'Logout',
 };
