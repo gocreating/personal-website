@@ -1,11 +1,19 @@
 import React from 'react';
 import PageLayout from '../layouts/PageLayout';
-import PageHeader from '../main/PageHeader';
+import Container from '../main/Container';
 
 const NotFoundPage = (props) => (
   <PageLayout>
-    <PageHeader title="Page Not Found" />
-    <p>This is a 404 page.</p>
+    <section>
+      <Container>
+        <div className="row">
+          <div className="col-lg-12">
+            <h1>頁面不存在</h1>
+            <p>您所查詢的頁面不存在。</p>
+          </div>
+        </div>
+      </Container>
+    </section>
   </PageLayout>
 );
 
