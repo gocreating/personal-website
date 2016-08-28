@@ -5,6 +5,7 @@ import authRequired from '../middlewares/authRequired';
 import userController from '../controllers/user';
 import localeController from '../controllers/locale';
 import todoController from '../controllers/todo';
+import blogController from '../controllers/blog';
 
 export default ({ app }) => {
   // app.post('/api/user', bodyParser.json, userController.create);
@@ -28,4 +29,12 @@ export default ({ app }) => {
   app.post('/api/todo', bodyParser.json, todoController.create);
   app.get('/api/todo', todoController.list);
   app.delete('/api/todo/:id', todoController.remove);
+
+  // blog
+  app.get('/api/blog', blogController.list);
+  app.post('/api/blog', authRequired, bodyParser.json, blogController.create);
+  app.get('/api/blog/:slug', blogController.read);
+  app.put('/api/blog/:slug',
+    authRequired, bodyParser.json, blogController.update);
+  app.delete('/api/blog/:slug', authRequired, blogController.remove);
 };
