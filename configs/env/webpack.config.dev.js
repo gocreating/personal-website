@@ -52,6 +52,9 @@ module.exports = {
         'sass-loader',
         'postcss-loader',
       ],
-    },],
+    }, {
+      test: /\.json$/,
+      loader: 'json',
+    }],
   },
 };
