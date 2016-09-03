@@ -26,6 +26,8 @@ import {
   DefaultDraftBlockRenderMap,
 } from 'draft-js';
 import { Map } from 'immutable';
+import BlockStyleControls from './components/BlockStyleControls';
+import InlineStyleControls from './components/InlineStyleControls';
 import blockTypes from './blockTypes';
 
 class BlogEditor extends Component {
@@ -41,6 +43,10 @@ class BlogEditor extends Component {
     this.focus = () => this.refs.editor.focus();
     this.onChange = (editorState) => this.setState({ editorState });
     this.handleKeyCommand = (command) => this._handleKeyCommand(command);
+    this.toggleBlockType = (type) => this._toggleBlockType(type);
+    this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
+  }
+
   // exposed method
   logState() {
     let { editorState } = this.state;
@@ -93,6 +99,24 @@ class BlogEditor extends Component {
     return false;
   }
 
+  _toggleBlockType(blockType) {
+    this.onChange(
+      RichUtils.toggleBlockType(
+        this.state.editorState,
+        blockType
+      )
+    );
+  }
+
+  _toggleInlineStyle(inlineStyle) {
+    this.onChange(
+      RichUtils.toggleInlineStyle(
+        this.state.editorState,
+        inlineStyle
+      )
+    );
+  }
+
   blockRendererFn(contentBlock) {
     let type = contentBlock.getType();
     return blockTypes[type];
@@ -118,6 +142,14 @@ class BlogEditor extends Component {
 
     return (
       <div className="blogEditor-root">
+        <BlockStyleControls
+          editorState={editorState}
+          onToggle={this.toggleBlockType}
+        />
+        <InlineStyleControls
+          editorState={editorState}
+          onToggle={this.toggleInlineStyle}
+        />
         <div className="blogEditor-container" onClick={this.focus}>
           <Editor
             ref="editor"

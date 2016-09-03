@@ -9,6 +9,22 @@
   min-height: 300px;
   padding: 30px;
 }
+.blogEditor-editorControls {
+  display: inline-block;
+  border-left: 3px solid #bbb;
+}
+.blogEditor-controlButton {
+  display: inline-block;
+  margin: 5px;
+  padding: 5px;
+  color: black;
+  background-color: #eee;
+  cursor: pointer;
+}
+.blogEditor-controlButton.active {
+  color: #eee;
+  background-color: #333;
+}
 /* blog-post */
 .post-header-level-1 {
   font-size: 50px;
