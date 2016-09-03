@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   Editor,
   EditorState,
+  RichUtils,
   convertToRaw,
   convertFromRaw,
 } from 'draft-js';
@@ -15,6 +16,7 @@ class BlogEditor extends Component {
     };
     this.focus = () => this.refs.editor.focus();
     this.onChange = (editorState) => this.setState({ editorState });
+    this.handleKeyCommand = (command) => this._handleKeyCommand(command);
   // exposed method
   logState() {
     let { editorState } = this.state;
@@ -39,6 +41,17 @@ class BlogEditor extends Component {
     return convertToRaw(contentState);
   }
 
+
+  _handleKeyCommand(command) {
+    let { editorState } = this.state;
+    let newState = RichUtils.handleKeyCommand(editorState, command);
+
+    if (newState) {
+      this.onChange(newState);
+      return true;
+    }
+    return false;
+  }
   }
 
   render() {
@@ -53,6 +66,7 @@ class BlogEditor extends Component {
             ref="editor"
             editorState={editorState}
             onChange={this.onChange}
+            handleKeyCommand={this.handleKeyCommand}
           />
         </div>
       </div>
