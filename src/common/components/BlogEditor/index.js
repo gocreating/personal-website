@@ -1,3 +1,21 @@
+// A helpful component structure
+// ref: <https://github.com/facebook/draft-js/pull/387>
+//
+// +----------+wrapper +->set by blockRenderMap
+// |
+// |    +-----+element w/ props +-->set by blockRenderMap
+// |    |
+// |    |   +-+component w/ props +-->set by blockRendererFn
+// |    |   |
+// |    |   |
+// |    |   +-+
+// |    |
+// |    +-----+
+// |
+// |    // ... more blocks within the wrapper
+// |
+// +----------+
+
 import React, { Component } from 'react';
 import {
   Editor,
@@ -5,7 +23,10 @@ import {
   RichUtils,
   convertToRaw,
   convertFromRaw,
+  DefaultDraftBlockRenderMap,
 } from 'draft-js';
+import { Map } from 'immutable';
+import blockTypes from './blockTypes';
 
 class BlogEditor extends Component {
   constructor(props) {
@@ -13,6 +34,9 @@ class BlogEditor extends Component {
 
     this.state = {
       editorState: EditorState.createEmpty(),
+      blockRenderMap: DefaultDraftBlockRenderMap.merge(
+        this._getBlockRenderMap()
+      ),
     };
     this.focus = () => this.refs.editor.focus();
     this.onChange = (editorState) => this.setState({ editorState });
@@ -41,6 +65,22 @@ class BlogEditor extends Component {
     return convertToRaw(contentState);
   }
 
+  _getBlockRenderMap() {
+    let obj = {
+      'paragraph': {
+        element: 'div',
+      },
+      'unstyled': {
+        element: 'div',
+      },
+    };
+    for (let blockType in blockTypes) {
+      obj[blockType] = {
+        element: 'div',
+      };
+    }
+    return Map(obj);
+  }
 
   _handleKeyCommand(command) {
     let { editorState } = this.state;
@@ -52,11 +92,16 @@ class BlogEditor extends Component {
     }
     return false;
   }
+
+  blockRendererFn(contentBlock) {
+    let type = contentBlock.getType();
+    return blockTypes[type];
   }
 
   render() {
     let {
       editorState,
+      blockRenderMap,
     } = this.state;
 
     return (
@@ -67,6 +112,8 @@ class BlogEditor extends Component {
             editorState={editorState}
             onChange={this.onChange}
             handleKeyCommand={this.handleKeyCommand}
+            blockRenderMap={blockRenderMap}
+            blockRendererFn={this.blockRendererFn}
           />
         </div>
       </div>

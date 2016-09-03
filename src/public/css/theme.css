@@ -9,6 +9,28 @@
   min-height: 300px;
   padding: 30px;
 }
+/* blog-post */
+.post-header-level-1 {
+  font-size: 50px;
+  border-bottom: 3px solid #eee;
+}
+.post-header-level-2 {
+  font-size: 40px;
+  border-bottom: 1px solid #eee;
+}
+.post-header-level-3 {
+  font-size: 30px;
+}
+.post-header-level-4 {
+  font-size: 20px;
+}
+.post-header-level-5 {
+  font-size: 16px;
+}
+.post-header-level-6 {
+  font-size: 16px;
+  font-style: italic;
+}
 /*!
  * Start Bootstrap - Freelancer v3.3.7+1 (http://startbootstrap.com/template-overviews/freelancer)
  * Copyright 2013-2016 Start Bootstrap
