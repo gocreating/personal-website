@@ -98,6 +98,18 @@ class BlogEditor extends Component {
     return blockTypes[type];
   }
 
+  blockStyleFn(contentBlock) {
+    let type = contentBlock.getType();
+    let styleMap = {
+      'blockquote': 'post-blockquote',
+      'code-block': 'post-code-block',
+      'unordered-list-item': 'post-unordered-list-item',
+      'ordered-list-item': 'post-ordered-list-item',
+      'unstyled': 'post-paragraph',
+    };
+    return styleMap[type];
+  }
+
   render() {
     let {
       editorState,
@@ -114,6 +126,7 @@ class BlogEditor extends Component {
             handleKeyCommand={this.handleKeyCommand}
             blockRenderMap={blockRenderMap}
             blockRendererFn={this.blockRendererFn}
+            blockStyleFn={this.blockStyleFn}
           />
         </div>
       </div>

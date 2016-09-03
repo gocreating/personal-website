@@ -31,6 +31,32 @@
   font-size: 16px;
   font-style: italic;
 }
+.post-blockquote {
+  background-color: #eee;
+  border-left: 3px solid #333;
+  margin: 0px;
+  padding: 10px 0 10px 35px;
+  line-height: 40px;
+  font-size: 22px;
+}
+.post-code-block {
+  background-color: #eee;
+  line-height: 24px;
+  font-size: 18px;
+}
+pre {
+  border: 0px;
+  background-color: inherit;
+  margin: 0px;
+  padding: 0px;
+}
+.post-paragraph,
+.post-unordered-list-item,
+.post-ordered-list-item {
+  font-size: 22px;
+  line-height: 40px;
+  min-height: 40px;
+}
 /*!
  * Start Bootstrap - Freelancer v3.3.7+1 (http://startbootstrap.com/template-overviews/freelancer)
  * Copyright 2013-2016 Start Bootstrap
