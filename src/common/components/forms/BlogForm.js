@@ -36,17 +36,20 @@ class BlogForm extends Component {
           initializeForm({
             title: json.blog.title,
           });
+          this.refs.blogEditor.setRawContent(json.blog.rawContent);
         });
     }
   }
 
   _handleSubmit(formData) {
     let { type, routerParams } = this.props;
+    let rawContent = this.refs.blogEditor.getRawContent();
 
     if (type === FormTypes.CREATE) {
       blogAPI(this.context.store.getState().apiEngine)
         .create({
           title: formData.title,
+          rawContent,
         })
         .catch((err) => {
           alert('Create blog fail');
@@ -59,6 +62,7 @@ class BlogForm extends Component {
       blogAPI(this.context.store.getState().apiEngine)
         .update(routerParams.slug, {
           title: formData.title,
+          rawContent,
         })
         .catch((err) => {
           alert('Update blog fail');
@@ -79,16 +83,21 @@ class BlogForm extends Component {
 
     return (
       <Form onSubmit={handleSubmit(this.handleSubmit)}>
+        <Form.Button
+          onClick={() => this.refs.blogEditor.logState()}
+          type="button"
+          title="Log State"
+        />
+        <Form.Button
+          type="submit"
+          title={type === FormTypes.CREATE ? '發佈' : '更新'}
+        />
         <Input
           type="text"
           placeholder="標題"
           field={title}
         />
         <BlogEditor ref="blogEditor" />
-        <Form.Button
-          type="submit"
-          title={type === FormTypes.CREATE ? '發佈' : '更新'}
-        />
       </Form>
     );
   }
