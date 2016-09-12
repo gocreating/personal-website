@@ -24,7 +24,9 @@ import {
   convertToRaw,
   convertFromRaw,
   DefaultDraftBlockRenderMap,
+  Modifier,
 } from 'draft-js';
+import isSoftNewlineEvent from 'draft-js/lib/isSoftNewlineEvent';
 import { Map } from 'immutable';
 import BlockStyleControls from './components/BlockStyleControls';
 import InlineStyleControls from './components/InlineStyleControls';
@@ -45,6 +47,8 @@ class BlogEditor extends Component {
     this.handleKeyCommand = (command) => this._handleKeyCommand(command);
     this.toggleBlockType = (type) => this._toggleBlockType(type);
     this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
+    this.handleReturn = this._handleReturn.bind(this);
+    this.handleReturnSoftNewline = this._handleReturnSoftNewline.bind(this);
   }
 
   // exposed method
@@ -134,6 +138,42 @@ class BlogEditor extends Component {
     return styleMap[type];
   }
 
+  // ref: https://github.com/sstur/react-rte/blob/master/src/RichTextEditor.js
+  _handleReturn(e) {
+    if (this.handleReturnSoftNewline(e)) {
+      return true;
+    }
+    return false;
+  }
+
+  // `shift + return` should insert a soft newline.
+  _handleReturnSoftNewline(e) {
+    let { editorState } = this.state;
+    if (isSoftNewlineEvent(e)) {
+      let selection = editorState.getSelection();
+      if (selection.isCollapsed()) {
+        this.onChange(RichUtils.insertSoftNewline(editorState));
+      } else {
+        let content = editorState.getCurrentContent();
+        let newContent = Modifier.removeRange(content, selection, 'forward');
+        let newSelection = newContent.getSelectionAfter();
+        let block = newContent.getBlockForKey(newSelection.getStartKey());
+        newContent = Modifier.insertText(
+          newContent,
+          newSelection,
+          '\n',
+          block.getInlineStyleAt(newSelection.getStartOffset()),
+          null,
+        );
+        this.onChange(
+          EditorState.push(editorState, newContent, 'insert-fragment')
+        );
+      }
+      return true;
+    }
+    return false;
+  }
+
   render() {
     let {
       editorState,
@@ -159,6 +199,7 @@ class BlogEditor extends Component {
             blockRenderMap={blockRenderMap}
             blockRendererFn={this.blockRendererFn}
             blockStyleFn={this.blockStyleFn}
+            handleReturn={this.handleReturn}
           />
         </div>
       </div>
