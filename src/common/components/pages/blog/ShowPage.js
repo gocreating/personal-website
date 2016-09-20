@@ -1,10 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import { convertFromRaw } from 'draft-js';
-import { stateToMarkdown } from 'draft-js-export-markdown';
-import MDReactComponent from 'markdown-react-js';
+import redraft from 'redraft';
 import blogAPI from '../../../api/blog';
 import PageLayout from '../../layouts/PageLayout';
 import Container from '../../main/Container';
+import renderer from '../../BlogEditor/renderer';
 
 class ShowPage extends Component {
   constructor(props) {
@@ -13,7 +12,6 @@ class ShowPage extends Component {
     this.handleRemoveBtnClick = this._handleRemoveBtnClick.bind(this);
     this.state = {
       blog: {},
-      markdown: '',
     };
   }
 
@@ -26,10 +24,8 @@ class ShowPage extends Component {
       })
       .then((json) => {
         if (json.blog) {
-          let contentState = convertFromRaw(json.blog.rawContent);
           this.setState({
             blog: json.blog,
-            markdown: stateToMarkdown(contentState),
           });
         }
       });
@@ -52,9 +48,10 @@ class ShowPage extends Component {
   }
 
   render() {
-    let { blog, markdown } = this.state;
+    let { blog } = this.state;
     let { token } = this.context.store.getState().cookie;
     let isAuth = !!token;
+    let rendered = redraft(blog.rawContent, renderer);
 
     return (
       <PageLayout>
@@ -77,8 +74,11 @@ class ShowPage extends Component {
               刪除
             </button>
           )}
-          <h1>{blog.title}</h1>
-          <MDReactComponent text={markdown} />
+          <div style={{fontSize: 80, margin: '50px 0', textAlign: 'center'}}>
+            {blog.title}
+          </div>
+          {rendered}
+          <div style={{height: 100}} />
         </Container>
       </PageLayout>
     );
