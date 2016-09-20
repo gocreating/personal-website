@@ -1,7 +1,10 @@
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 import { reduxForm } from 'redux-form';
 import FormTypes from '../../constants/FormTypes';
 import blogAPI from '../../api/blog';
+import Container from '../main/Container';
+import Section from '../Section';
 import Form from '../main/Form';
 import Input from '../reduxForm/Input';
 import BlogEditor from '../BlogEditor';
@@ -77,27 +80,57 @@ class BlogForm extends Component {
   render() {
     const {
       type,
+      routerParams,
       fields: { title },
       handleSubmit,
     } = this.props;
 
     return (
       <Form onSubmit={handleSubmit(this.handleSubmit)}>
-        <Form.Button
-          onClick={() => this.refs.blogEditor.logState()}
-          type="button"
-          title="Log State"
-        />
-        <Form.Button
-          type="submit"
-          title={type === FormTypes.CREATE ? '發佈' : '更新'}
-        />
-        <Input
-          type="text"
-          placeholder="標題"
-          field={title}
-        />
-        <BlogEditor ref="blogEditor" />
+        <Section
+          style={{
+            backgroundColor: 'rgb(235,239,242)',
+          }}
+        >
+          <Container>
+            <div className="btn-group" role="group">
+              <button
+                className="btn btn-default"
+                type="submit"
+              >
+                {type === FormTypes.CREATE ? '發佈' : '更新'}
+              </button>
+              <button
+                className="btn btn-default"
+                type="button"
+                onClick={() => this.refs.blogEditor.logState()}
+              >
+                Log State
+              </button>
+            </div>
+            <Link
+              to={`/blog/${routerParams.slug}`}
+              className="btn btn-link pull-right"
+            >
+              取消
+            </Link>
+          </Container>
+        </Section>
+        <Section>
+          <Container>
+            <Input
+              type="text"
+              placeholder="標題"
+              style={{
+                fontSize: 80,
+                textAlign: 'center',
+                height: 'auto',
+              }}
+              field={title}
+            />
+            <BlogEditor ref="blogEditor" />
+          </Container>
+        </Section>
       </Form>
     );
   }

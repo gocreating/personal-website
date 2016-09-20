@@ -3,6 +3,7 @@ import redraft from 'redraft';
 import blogAPI from '../../../api/blog';
 import PageLayout from '../../layouts/PageLayout';
 import Container from '../../main/Container';
+import Section from '../../Section';
 import renderer from '../../BlogEditor/renderer';
 
 class ShowPage extends Component {
@@ -55,25 +56,34 @@ class ShowPage extends Component {
 
     return (
       <PageLayout>
+        {isAuth && (
+          <Section
+            style={{
+              backgroundColor: 'rgb(235,239,242)',
+            }}
+          >
+            <Container>
+              <div className="btn-group" role="group">
+                <button
+                  className="btn btn-default"
+                  type="button"
+                  onClick={this.handleEditBtnClick}
+                >
+                  編輯
+                </button>
+
+                <button
+                  className="btn btn-danger"
+                  type="button"
+                  onClick={this.handleRemoveBtnClick}
+                >
+                  刪除
+                </button>
+              </div>
+            </Container>
+          </Section>
+        )}
         <Container>
-          {isAuth && (
-            <button
-              className="btn btn-warning"
-              type="button"
-              onClick={this.handleEditBtnClick}
-            >
-              編輯
-            </button>
-          )}
-          {isAuth && (
-            <button
-              className="btn btn-danger"
-              type="button"
-              onClick={this.handleRemoveBtnClick}
-            >
-              刪除
-            </button>
-          )}
           <div style={{fontSize: 80, margin: '50px 0', textAlign: 'center'}}>
             {blog.title}
           </div>
