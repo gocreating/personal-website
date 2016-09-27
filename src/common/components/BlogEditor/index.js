@@ -51,6 +51,30 @@ class BlogEditor extends Component {
     this.handleReturnSoftNewline = this._handleReturnSoftNewline.bind(this);
   }
 
+  componentDidMount() {
+    /* eslint-disable */
+    setTimeout(function() {
+      let $toolbar = $('.blogEditor-toolbar');
+      let $container = $('.blogEditor-container');
+      let $window = $(window);
+      /* eslint-enable */
+      let resetDimension = () => {
+        $toolbar.width($container.outerWidth());
+        /* eslint-disable */
+        let $affixedContainer =
+        $('.blogEditor-toolbar.affix + .blogEditor-container');
+        /* eslint-enable */
+        $container.css('margin-top',
+        $affixedContainer.length > 0 ? $toolbar.outerHeight() : 0);
+      };
+      $toolbar
+        .affix({ offset: $toolbar.offset().top })
+        .on('affixed-top.bs.affix', resetDimension)
+        .on('affixed.bs.affix', resetDimension);
+      $window.resize(resetDimension);
+    }, 1000);
+  }
+
   // exposed method
   logState() {
     let { editorState } = this.state;
@@ -182,14 +206,16 @@ class BlogEditor extends Component {
 
     return (
       <div className="blogEditor-root">
-        <BlockStyleControls
-          editorState={editorState}
-          onToggle={this.toggleBlockType}
-        />
-        <InlineStyleControls
-          editorState={editorState}
-          onToggle={this.toggleInlineStyle}
-        />
+        <div className="blogEditor-toolbar">
+          <BlockStyleControls
+            editorState={editorState}
+            onToggle={this.toggleBlockType}
+          />
+          <InlineStyleControls
+            editorState={editorState}
+            onToggle={this.toggleInlineStyle}
+          />
+        </div>
         <div className="blogEditor-container" onClick={this.focus}>
           <Editor
             ref="editor"
