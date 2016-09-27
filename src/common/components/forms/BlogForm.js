@@ -22,6 +22,7 @@ const validate = (values) => {
 class BlogForm extends Component {
   constructor(props) {
     super(props);
+    this.save = this._save.bind(this);
     this.handleSubmit = this._handleSubmit.bind(this);
   }
 
@@ -44,6 +45,22 @@ class BlogForm extends Component {
     }
   }
 
+  _save() {
+    let { routerParams } = this.props;
+    let { apiEngine, form } = this.context.store.getState();
+    let rawContent = this.refs.blogEditor.getRawContent();
+
+    return blogAPI(apiEngine)
+      .update(routerParams.slug, {
+        title: form.blog.title.value,
+        rawContent,
+      })
+      .catch((err) => {
+        alert('Update blog fail');
+        throw err;
+      });
+  }
+
   _handleSubmit(formData) {
     let { type, routerParams } = this.props;
     let rawContent = this.refs.blogEditor.getRawContent();
@@ -62,18 +79,9 @@ class BlogForm extends Component {
           this.context.router.push(`/blog/${json.blog.slug}`);
         });
     } else if (type === FormTypes.UPDATE) {
-      blogAPI(this.context.store.getState().apiEngine)
-        .update(routerParams.slug, {
-          title: formData.title,
-          rawContent,
-        })
-        .catch((err) => {
-          alert('Update blog fail');
-          throw err;
-        })
-        .then((json) => {
-          this.context.router.push(`/blog/${routerParams.slug}`);
-        });
+      this.save().then((json) => {
+        this.context.router.push(`/blog/${routerParams.slug}`);
+      });
     }
   }
 
@@ -100,6 +108,15 @@ class BlogForm extends Component {
               >
                 {type === FormTypes.CREATE ? '發佈' : '更新'}
               </button>
+              {type === FormTypes.UPDATE && (
+                <button
+                  className="btn btn-default"
+                  type="button"
+                  onClick={() => this.save()}
+                >
+                  儲存
+                </button>
+              )}
               <button
                 className="btn btn-default"
                 type="button"
@@ -108,12 +125,21 @@ class BlogForm extends Component {
                 Log State
               </button>
             </div>
-            <Link
-              to={`/blog/${routerParams.slug}`}
-              className="btn btn-link pull-right"
-            >
-              取消
-            </Link>
+            <div className="btn-group pull-right" role="group">
+              <Link
+                to={`/blog/${routerParams.slug}`}
+                className="btn btn-link"
+                target="_blank"
+              >
+                檢視
+              </Link>
+              <Link
+                to={`/blog/${routerParams.slug}`}
+                className="btn btn-link"
+              >
+                取消
+              </Link>
+            </div>
           </Container>
         </Section>
         <Section>
