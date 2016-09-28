@@ -1,57 +1,57 @@
 import { handleDbError } from '../decorators/handleError';
 import filterAttribute from '../utils/filterAttribute';
-import Blog from '../models/Blog';
+import Post from '../models/Post';
 
 export default {
   list(req, res) {
-    Blog.find({}, handleDbError(res)((blogs) => {
+    Post.find({}, handleDbError(res)((posts) => {
       res.json({
-        blogs: blogs,
+        posts: posts,
         isError: false,
       });
     }));
   },
 
   create(req, res) {
-    const blog = Blog({
+    const post = Post({
       author: req.user._id,
       title: req.body.title,
       rawContent: req.body.rawContent,
     });
 
-    blog.save(handleDbError(res)((blog) => {
+    post.save(handleDbError(res)((post) => {
       res.json({
-        blog: blog,
+        post: post,
         isError: false,
       });
     }));
   },
 
   read(req, res) {
-    Blog.findById(req.params.slug, handleDbError(res)((blog) => {
+    Post.findById(req.params.slug, handleDbError(res)((post) => {
       res.json({
-        blog: blog,
+        post: post,
         isError: false,
       });
     }));
   },
 
   update(req, res) {
-    let blog = filterAttribute(req.body, [
+    let post = filterAttribute(req.body, [
       'title',
       'rawContent',
     ]);
-    Blog.update({ _id: req.params.slug }, blog, handleDbError(res)((raw) => {
+    Post.update({ _id: req.params.slug }, post, handleDbError(res)((raw) => {
       res.json({
         originAttributes: req.body,
-        updatedAttributes: blog,
+        updatedAttributes: post,
         isError: false,
       });
     }));
   },
 
   remove(req, res) {
-    Blog.remove({_id: req.params.slug}, handleDbError(res)(() => {
+    Post.remove({_id: req.params.slug}, handleDbError(res)(() => {
       res.json({
         isError: false,
       });

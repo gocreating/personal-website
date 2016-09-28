@@ -1,5 +1,5 @@
 export default (store) => ({
-  path: 'blog',
+  path: 'blog/post',
   getIndexRoute(nextState, cb) {
     require.ensure([], (require) => {
       cb(null, require('./list').default(store));

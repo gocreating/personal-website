@@ -4,7 +4,7 @@ function slugify(v) {
   return (v || '').replace(/\s+/g, '-');
 }
 
-let Blog = new mongoose.Schema({
+let Post = new mongoose.Schema({
   _id: String,
   author: {
     type: Schema.ObjectId,
@@ -29,7 +29,7 @@ let Blog = new mongoose.Schema({
 });
 
 // ref: <https://gist.github.com/aheckmann/3658511>
-Blog.path('title').set(function(value) {
+Post.path('title').set(function(value) {
   this.slug = slugify(value);
   if (this.isNew) {
     this._id = this.slug;
@@ -37,4 +37,4 @@ Blog.path('title').set(function(value) {
   return value;
 });
 
-export default mongoose.model('Blog', Blog);
+export default mongoose.model('Post', Post);

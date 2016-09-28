@@ -43,7 +43,7 @@ class Navigation extends Component {
 
           <Navbar.Body id="navbar-collapse">
             <Navbar.Nav>
-              <NavLink to="/blog">
+              <NavLink to="/blog/post">
                 <Text id="nav.blog" />
               </NavLink>
               <NavLink to="/resume">
@@ -63,7 +63,7 @@ class Navigation extends Component {
               </Navbar.Dropdown>
               {isAuth && (
                 <Navbar.Dropdown title={user.name || user.email}>
-                  <NavLink to="/blog/new">
+                  <NavLink to="/blog/post/new">
                     <Text id="nav.blog.new" />
                   </NavLink>
                   <NavLink to="/user/logout">

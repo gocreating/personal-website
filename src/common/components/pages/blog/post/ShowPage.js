@@ -1,10 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import redraft from 'redraft';
-import blogAPI from '../../../api/blog';
-import PageLayout from '../../layouts/PageLayout';
-import Container from '../../main/Container';
-import Section from '../../Section';
-import renderer from '../../BlogEditor/renderer';
+import blogAPI from '../../../../api/blog';
+import PageLayout from '../../../layouts/PageLayout';
+import Container from '../../../main/Container';
+import Section from '../../../Section';
+import renderer from '../../../BlogEditor/renderer';
 
 class ShowPage extends Component {
   constructor(props) {
@@ -12,47 +12,49 @@ class ShowPage extends Component {
     this.handleEditBtnClick = this._handleEditBtnClick.bind(this);
     this.handleRemoveBtnClick = this._handleRemoveBtnClick.bind(this);
     this.state = {
-      blog: {},
+      post: {},
     };
   }
 
   componentDidMount() {
     blogAPI(this.context.store.getState().apiEngine)
+      .post()
       .read(this.props.params.slug)
       .catch((err) => {
-        alert('Read blog error');
+        alert('Read post error');
         throw err;
       })
       .then((json) => {
-        if (json.blog) {
+        if (json.post) {
           this.setState({
-            blog: json.blog,
+            post: json.post,
           });
         }
       });
   }
 
   _handleEditBtnClick() {
-    this.context.router.push(`/blog/${this.props.params.slug}/edit`);
+    this.context.router.push(`/blog/post/${this.props.params.slug}/edit`);
   }
 
   _handleRemoveBtnClick() {
     blogAPI(this.context.store.getState().apiEngine)
+      .post()
       .remove(this.props.params.slug)
       .catch((err) => {
-        alert('Remove blog error');
+        alert('Remove post error');
         throw err;
       })
       .then((json) => {
-        this.context.router.push('/blog');
+        this.context.router.push('/blog/post');
       });
   }
 
   render() {
-    let { blog } = this.state;
+    let { post } = this.state;
     let { token } = this.context.store.getState().cookie;
     let isAuth = !!token;
-    let rendered = redraft(blog.rawContent, renderer);
+    let rendered = redraft(post.rawContent, renderer);
 
     return (
       <PageLayout>
@@ -85,7 +87,7 @@ class ShowPage extends Component {
         )}
         <Container>
           <div style={{fontSize: 80, margin: '50px 0', textAlign: 'center'}}>
-            {blog.title}
+            {post.title}
           </div>
           {rendered}
           <div style={{height: 100}} />

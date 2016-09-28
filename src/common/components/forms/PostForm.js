@@ -19,7 +19,7 @@ const validate = (values) => {
   return errors;
 };
 
-class BlogForm extends Component {
+class PostForm extends Component {
   constructor(props) {
     super(props);
     this.save = this._save.bind(this);
@@ -31,16 +31,17 @@ class BlogForm extends Component {
 
     if (type === FormTypes.UPDATE) {
       blogAPI(this.context.store.getState().apiEngine)
+        .post()
         .read(routerParams.slug)
         .catch((err) => {
-          alert('Read blog fail');
+          alert('Read post fail');
           throw err;
         })
         .then((json) => {
           initializeForm({
-            title: json.blog.title,
+            title: json.post.title,
           });
-          this.refs.blogEditor.setRawContent(json.blog.rawContent);
+          this.refs.blogEditor.setRawContent(json.post.rawContent);
         });
     }
   }
@@ -51,12 +52,13 @@ class BlogForm extends Component {
     let rawContent = this.refs.blogEditor.getRawContent();
 
     return blogAPI(apiEngine)
+      .post()
       .update(routerParams.slug, {
-        title: form.blog.title.value,
+        title: form.post.title.value,
         rawContent,
       })
       .catch((err) => {
-        alert('Update blog fail');
+        alert('Update post fail');
         throw err;
       });
   }
@@ -67,20 +69,21 @@ class BlogForm extends Component {
 
     if (type === FormTypes.CREATE) {
       blogAPI(this.context.store.getState().apiEngine)
+        .post()
         .create({
           title: formData.title,
           rawContent,
         })
         .catch((err) => {
-          alert('Create blog fail');
+          alert('Create post fail');
           throw err;
         })
         .then((json) => {
-          this.context.router.push(`/blog/${json.blog.slug}`);
+          this.context.router.push(`/blog/post/${json.post.slug}`);
         });
     } else if (type === FormTypes.UPDATE) {
       this.save().then((json) => {
-        this.context.router.push(`/blog/${routerParams.slug}`);
+        this.context.router.push(`/blog/post/${routerParams.slug}`);
       });
     }
   }
@@ -125,21 +128,33 @@ class BlogForm extends Component {
                 Log State
               </button>
             </div>
-            <div className="btn-group pull-right" role="group">
-              <Link
-                to={`/blog/${routerParams.slug}`}
-                className="btn btn-link"
-                target="_blank"
-              >
-                檢視
-              </Link>
-              <Link
-                to={`/blog/${routerParams.slug}`}
-                className="btn btn-link"
-              >
-                取消
-              </Link>
-            </div>
+            {type === FormTypes.CREATE && (
+              <div className="btn-group pull-right" role="group">
+                <Link
+                  to="/blog/post"
+                  className="btn btn-link"
+                >
+                  取消
+                </Link>
+              </div>
+            )}
+            {type === FormTypes.UPDATE && (
+              <div className="btn-group pull-right" role="group">
+                <Link
+                  to={`/blog/post/${routerParams.slug}`}
+                  className="btn btn-link"
+                  target="_blank"
+                >
+                  檢視
+                </Link>
+                <Link
+                  to={`/blog/post/${routerParams.slug}`}
+                  className="btn btn-link"
+                >
+                  取消
+                </Link>
+              </div>
+            )}
           </Container>
         </Section>
         <Section>
@@ -162,26 +177,26 @@ class BlogForm extends Component {
   }
 };
 
-BlogForm.contextTypes = {
+PostForm.contextTypes = {
   store: PropTypes.object.isRequired,
   router: PropTypes.any.isRequired,
 };
 
-BlogForm.propTypes = {
+PostForm.propTypes = {
   type: PropTypes.oneOf([FormTypes.CREATE, FormTypes.UPDATE]).isRequired,
   fields: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   routerParams: PropTypes.object,
 };
 
-BlogForm.defaultProps = {
+PostForm.defaultProps = {
   type: FormTypes.CREATE,
 };
 
 export default reduxForm({
-  form: 'blog',
+  form: 'post',
   fields: [
     'title',
   ],
   validate,
-})(BlogForm);
+})(PostForm);
