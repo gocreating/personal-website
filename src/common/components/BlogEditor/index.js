@@ -26,16 +26,21 @@ import {
   DefaultDraftBlockRenderMap,
   Modifier,
   CompositeDecorator,
+  Entity,
 } from 'draft-js';
 import isSoftNewlineEvent from 'draft-js/lib/isSoftNewlineEvent';
 import { Map } from 'immutable';
 import BlockStyleControls from './components/BlockStyleControls';
 import InlineStyleControls from './components/InlineStyleControls';
+import EntityControls from './components/EntityControls';
 import blockTypes from './blockTypes';
+import { EntityTypes } from './constants';
 import {
   link as linkDecorator,
   image as imageDecorator,
 } from './decorators';
+import getEntityAtCursor from './utils/getEntityAtCursor';
+import clearEntityForRange from './utils/clearEntityForRange';
 
 class BlogEditor extends Component {
   decorator = new CompositeDecorator([
@@ -59,6 +64,8 @@ class BlogEditor extends Component {
     this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
     this.handleReturn = this._handleReturn.bind(this);
     this.handleReturnSoftNewline = this._handleReturnSoftNewline.bind(this);
+    this.setLink = this._setLink.bind(this);
+    this.insertImage = this._insertImage.bind(this);
   }
 
   componentDidMount() {
@@ -211,6 +218,46 @@ class BlogEditor extends Component {
     return false;
   }
 
+  _setLink(url) {
+    let { editorState } = this.state;
+    let selection = editorState.getSelection();
+    let entityKey = Entity.create(EntityTypes.LINK, 'MUTABLE', { url });
+
+    this.setState({
+      editorState: RichUtils.toggleLink(
+        editorState,
+        selection,
+        entityKey
+      ),
+    }, () => {
+      setTimeout(() => this.focus(), 0);
+    });
+  }
+
+  _insertImage() {
+    let { editorState } = this.state;
+    let currentContent = editorState.getCurrentContent();
+    let selection = editorState.getSelection();
+
+    let entityKey = Entity.create(EntityTypes.IMAGE, 'IMMUTABLE', {
+      url: '/img/favicon.ico',
+    });
+    let withEntity = Modifier.insertText(
+      currentContent,
+      selection,
+      ' ',
+      null,
+      entityKey
+    );
+    this.setState({
+      editorState: EditorState.push(
+        editorState,
+        withEntity,
+        'insert-text'
+      ),
+    });
+  }
+
   render() {
     let {
       editorState,
@@ -227,6 +274,25 @@ class BlogEditor extends Component {
           <InlineStyleControls
             editorState={editorState}
             onToggle={this.toggleInlineStyle}
+          />
+          <EntityControls
+            editorState={editorState}
+            onLinkBtnClick={() => {
+              this.setLink('');
+            }}
+            onRemoveLinkBtnClick={() => {
+              let { editorState } = this.state;
+              let entity = getEntityAtCursor(editorState);
+              if (entity != null) {
+                let { blockKey, startOffset, endOffset } = entity;
+                this.onChange(clearEntityForRange(
+                  editorState, blockKey, startOffset, endOffset
+                ));
+              }
+            }}
+            onImageBtnClick={() => {
+              this.insertImage();
+            }}
           />
         </div>
         <div className="blogEditor-container" onClick={this.focus}>
