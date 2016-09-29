@@ -12,7 +12,12 @@ class ShowPage extends Component {
     this.handleEditBtnClick = this._handleEditBtnClick.bind(this);
     this.handleRemoveBtnClick = this._handleRemoveBtnClick.bind(this);
     this.state = {
-      post: {},
+      post: {
+        rawContent: {
+          blocks: [],
+          entityMap: {},
+        },
+      },
     };
   }
 
