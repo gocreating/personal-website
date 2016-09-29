@@ -17,3 +17,8 @@ export let BLOCK_STYLES = [
   {label: 'UL', style: 'unordered-list-item'},
   {label: 'OL', style: 'ordered-list-item'},
 ];
+
+export const EntityTypes = {
+  LINK: 'LINK',
+  IMAGE: 'IMAGE',
+};

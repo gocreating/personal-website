@@ -25,19 +25,29 @@ import {
   convertFromRaw,
   DefaultDraftBlockRenderMap,
   Modifier,
+  CompositeDecorator,
 } from 'draft-js';
 import isSoftNewlineEvent from 'draft-js/lib/isSoftNewlineEvent';
 import { Map } from 'immutable';
 import BlockStyleControls from './components/BlockStyleControls';
 import InlineStyleControls from './components/InlineStyleControls';
 import blockTypes from './blockTypes';
+import {
+  link as linkDecorator,
+  image as imageDecorator,
+} from './decorators';
 
 class BlogEditor extends Component {
+  decorator = new CompositeDecorator([
+    linkDecorator,
+    imageDecorator,
+  ]);
+
   constructor(props) {
     super(props);
 
     this.state = {
-      editorState: EditorState.createEmpty(),
+      editorState: EditorState.createEmpty(this.decorator),
       blockRenderMap: DefaultDraftBlockRenderMap.merge(
         this._getBlockRenderMap()
       ),
@@ -89,7 +99,10 @@ class BlogEditor extends Component {
   // exposed method
   setRawContent(rawContent) {
     let contentState = convertFromRaw(rawContent);
-    let editorState = EditorState.createWithContent(contentState);
+    let editorState = EditorState.createWithContent(
+      contentState,
+      this.decorator
+    );
     this.setState({ editorState });
   }
 
