@@ -26,21 +26,15 @@ import {
   DefaultDraftBlockRenderMap,
   Modifier,
   CompositeDecorator,
-  Entity,
 } from 'draft-js';
 import isSoftNewlineEvent from 'draft-js/lib/isSoftNewlineEvent';
 import { Map } from 'immutable';
-import BlockStyleControls from './components/BlockStyleControls';
-import InlineStyleControls from './components/InlineStyleControls';
-import EntityControls from './components/EntityControls';
 import blockTypes from './blockTypes';
-import { EntityTypes } from './constants';
 import {
   link as linkDecorator,
   image as imageDecorator,
 } from './decorators';
-import getEntityAtCursor from './utils/getEntityAtCursor';
-import clearEntityForRange from './utils/clearEntityForRange';
+import Toolbar from './components/Toolbar';
 
 class BlogEditor extends Component {
   decorator = new CompositeDecorator([
@@ -58,38 +52,20 @@ class BlogEditor extends Component {
       ),
     };
     this.focus = () => this.refs.editor.focus();
-    this.onChange = (editorState) => this.setState({ editorState });
+    this.onChange = (editorState, cb) => this.setState({ editorState }, cb);
+    // this.onChange = (editorState) => {
+    //   if (!editorState.getSelection().isCollapsed()) {
+    //     let s = window.getSelection();
+    //     let oRange = s.getRangeAt(0);
+    //     let oRect = oRange.getBoundingClientRect();
+    //     console.log('oRange', oRange);
+    //     console.log('oRect', oRect);
+    //   }
+    //   this.setState({ editorState });
+    // };
     this.handleKeyCommand = (command) => this._handleKeyCommand(command);
-    this.toggleBlockType = (type) => this._toggleBlockType(type);
-    this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
     this.handleReturn = this._handleReturn.bind(this);
     this.handleReturnSoftNewline = this._handleReturnSoftNewline.bind(this);
-    this.setLink = this._setLink.bind(this);
-    this.insertImage = this._insertImage.bind(this);
-  }
-
-  componentDidMount() {
-    /* eslint-disable */
-    setTimeout(function() {
-      let $toolbar = $('.blogEditor-toolbar');
-      let $container = $('.blogEditor-container');
-      let $window = $(window);
-      /* eslint-enable */
-      let resetDimension = () => {
-        $toolbar.width($container.outerWidth());
-        /* eslint-disable */
-        let $affixedContainer =
-        $('.blogEditor-toolbar.affix + .blogEditor-container');
-        /* eslint-enable */
-        $container.css('margin-top',
-        $affixedContainer.length > 0 ? $toolbar.outerHeight() : 0);
-      };
-      $toolbar
-        .affix({ offset: $toolbar.offset().top })
-        .on('affixed-top.bs.affix', resetDimension)
-        .on('affixed.bs.affix', resetDimension);
-      $window.resize(resetDimension);
-    }, 1000);
   }
 
   // exposed method
@@ -147,24 +123,6 @@ class BlogEditor extends Component {
     return false;
   }
 
-  _toggleBlockType(blockType) {
-    this.onChange(
-      RichUtils.toggleBlockType(
-        this.state.editorState,
-        blockType
-      )
-    );
-  }
-
-  _toggleInlineStyle(inlineStyle) {
-    this.onChange(
-      RichUtils.toggleInlineStyle(
-        this.state.editorState,
-        inlineStyle
-      )
-    );
-  }
-
   blockRendererFn(contentBlock) {
     let type = contentBlock.getType();
     return blockTypes[type];
@@ -218,46 +176,6 @@ class BlogEditor extends Component {
     return false;
   }
 
-  _setLink(url) {
-    let { editorState } = this.state;
-    let selection = editorState.getSelection();
-    let entityKey = Entity.create(EntityTypes.LINK, 'MUTABLE', { url });
-
-    this.setState({
-      editorState: RichUtils.toggleLink(
-        editorState,
-        selection,
-        entityKey
-      ),
-    }, () => {
-      setTimeout(() => this.focus(), 0);
-    });
-  }
-
-  _insertImage() {
-    let { editorState } = this.state;
-    let currentContent = editorState.getCurrentContent();
-    let selection = editorState.getSelection();
-
-    let entityKey = Entity.create(EntityTypes.IMAGE, 'IMMUTABLE', {
-      url: '/img/favicon.ico',
-    });
-    let withEntity = Modifier.insertText(
-      currentContent,
-      selection,
-      ' ',
-      null,
-      entityKey
-    );
-    this.setState({
-      editorState: EditorState.push(
-        editorState,
-        withEntity,
-        'insert-text'
-      ),
-    });
-  }
-
   render() {
     let {
       editorState,
@@ -266,35 +184,11 @@ class BlogEditor extends Component {
 
     return (
       <div className="blogEditor-root">
-        <div className="blogEditor-toolbar">
-          <BlockStyleControls
-            editorState={editorState}
-            onToggle={this.toggleBlockType}
-          />
-          <InlineStyleControls
-            editorState={editorState}
-            onToggle={this.toggleInlineStyle}
-          />
-          <EntityControls
-            editorState={editorState}
-            onLinkBtnClick={() => {
-              this.setLink('');
-            }}
-            onRemoveLinkBtnClick={() => {
-              let { editorState } = this.state;
-              let entity = getEntityAtCursor(editorState);
-              if (entity != null) {
-                let { blockKey, startOffset, endOffset } = entity;
-                this.onChange(clearEntityForRange(
-                  editorState, blockKey, startOffset, endOffset
-                ));
-              }
-            }}
-            onImageBtnClick={() => {
-              this.insertImage();
-            }}
-          />
-        </div>
+        <Toolbar
+          editorState={editorState}
+          changeEditorState={this.onChange}
+          focusEditor={this.focus}
+        />
         <div className="blogEditor-container" onClick={this.focus}>
           <Editor
             ref="editor"
