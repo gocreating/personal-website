@@ -3,6 +3,8 @@ import { Entity } from 'draft-js';
 import classnames from 'classnames';
 import { EntityTypes } from '../constants';
 import getEntityAtCursor from '../utils/getEntityAtCursor';
+import EditLink from './EditLink';
+import EditImage from './EditImage';
 
 let MediaControls = ({
   editorState,
@@ -36,6 +38,7 @@ let MediaControls = ({
       >
         Remove Link
       </span>
+      {isLinkEntity && <EditLink entityKey={entityKey} />}
       <span
         className={classnames(
           'blogEditor-controlButton',
@@ -45,6 +48,7 @@ let MediaControls = ({
       >
         Image
       </span>
+      {isImageEntity && <EditImage entityKey={entityKey} />}
     </span>
   );
 };
