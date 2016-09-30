@@ -1,8 +1,11 @@
+import querystring from 'querystring';
 import todoAPI from '../../common/api/todo';
+import blogAPI from '../../common/api/blog';
 import wrapTimeout from '../decorators/wrapTimeout';
 import { loginUser } from '../../common/actions/userActions';
 import { updateLocale } from '../../common/actions/intlActions';
 import { setTodo } from '../../common/actions/todoActions';
+import { setPost } from '../../common/actions/blogActions';
 
 export default {
   user: (req, res, next) => {
@@ -37,6 +40,18 @@ export default {
       })
       .then((json) => {
         req.store.dispatch(setTodo(json.todos));
+        next();
+      });
+  }),
+  post: wrapTimeout(3000)((req, res, next) => {
+    blogAPI(req.store.getState().apiEngine)
+      .post()
+      .read(querystring.escape(req.params.slug))
+      .catch((err) => {
+        throw err;
+      })
+      .then((json) => {
+        req.store.dispatch(setPost(json.post));
         next();
       });
   }),
