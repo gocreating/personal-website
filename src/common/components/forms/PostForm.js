@@ -23,6 +23,7 @@ class PostForm extends Component {
     super(props);
     this.submit = this._submit.bind(this);
     this.save = this._save.bind(this);
+    this.onEditorChange = this._onEditorChange.bind(this);
   }
 
   componentDidMount() {
@@ -86,6 +87,10 @@ class PostForm extends Component {
         alert('Update post fail');
         throw err;
       });
+  }
+
+  _onEditorChange() {
+    this.props.touch('content');
   }
 
   render() {
@@ -169,7 +174,10 @@ class PostForm extends Component {
               }}
               field={title}
             />
-            <BlogEditor ref="blogEditor" />
+            <BlogEditor
+              ref="blogEditor"
+              onChange={this.onEditorChange}
+            />
           </Container>
         </Section>
       </div>
@@ -196,6 +204,7 @@ export default reduxForm({
   form: 'post',
   fields: [
     'title',
+    'content',
   ],
   validate,
 })(PostForm);

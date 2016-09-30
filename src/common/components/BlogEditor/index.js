@@ -16,7 +16,7 @@
 // |
 // +----------+
 
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import {
   Editor,
   EditorState,
@@ -52,7 +52,14 @@ class BlogEditor extends Component {
       ),
     };
     this.focus = () => this.refs.editor.focus();
-    this.onChange = (editorState, cb) => this.setState({ editorState }, cb);
+    this.onChange = (editorState, cb) => {
+      this.setState({ editorState }, (...args) => {
+        this.props.onChange();
+        if (cb) {
+          cb(...args);
+        }
+      });
+    };
     // this.onChange = (editorState) => {
     //   if (!editorState.getSelection().isCollapsed()) {
     //     let s = window.getSelection();
@@ -205,5 +212,9 @@ class BlogEditor extends Component {
     );
   }
 }
+
+BlogEditor.propTypes = {
+  onChange: PropTypes.func,
+};
 
 export default BlogEditor;
