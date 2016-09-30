@@ -5,7 +5,6 @@ import FormTypes from '../../constants/FormTypes';
 import blogAPI from '../../api/blog';
 import Container from '../main/Container';
 import Section from '../Section';
-import Form from '../main/Form';
 import Input from '../reduxForm/Input';
 import BlogEditor from '../BlogEditor';
 
@@ -22,8 +21,8 @@ const validate = (values) => {
 class PostForm extends Component {
   constructor(props) {
     super(props);
+    this.submit = this._submit.bind(this);
     this.save = this._save.bind(this);
-    this.handleSubmit = this._handleSubmit.bind(this);
   }
 
   componentDidMount() {
@@ -46,6 +45,32 @@ class PostForm extends Component {
     }
   }
 
+  _submit() {
+    let { type, routerParams } = this.props;
+
+    if (type === FormTypes.CREATE) {
+      let { apiEngine, form } = this.context.store.getState();
+      let rawContent = this.refs.blogEditor.getRawContent();
+      blogAPI(apiEngine)
+        .post()
+        .create({
+          title: form.post.title.value,
+          rawContent,
+        })
+        .catch((err) => {
+          alert('Create post fail');
+          throw err;
+        })
+        .then((json) => {
+          this.context.router.push(`/blog/post/${json.post.slug}`);
+        });
+    } else if (type === FormTypes.UPDATE) {
+      this.save().then((json) => {
+        this.context.router.push(`/blog/post/${routerParams.slug}`);
+      });
+    }
+  }
+
   _save() {
     let { routerParams } = this.props;
     let { apiEngine, form } = this.context.store.getState();
@@ -63,41 +88,15 @@ class PostForm extends Component {
       });
   }
 
-  _handleSubmit(formData) {
-    let { type, routerParams } = this.props;
-    let rawContent = this.refs.blogEditor.getRawContent();
-
-    if (type === FormTypes.CREATE) {
-      blogAPI(this.context.store.getState().apiEngine)
-        .post()
-        .create({
-          title: formData.title,
-          rawContent,
-        })
-        .catch((err) => {
-          alert('Create post fail');
-          throw err;
-        })
-        .then((json) => {
-          this.context.router.push(`/blog/post/${json.post.slug}`);
-        });
-    } else if (type === FormTypes.UPDATE) {
-      this.save().then((json) => {
-        this.context.router.push(`/blog/post/${routerParams.slug}`);
-      });
-    }
-  }
-
   render() {
     const {
       type,
       routerParams,
       fields: { title },
-      handleSubmit,
     } = this.props;
 
     return (
-      <Form onSubmit={handleSubmit(this.handleSubmit)}>
+      <div>
         <Section
           style={{
             backgroundColor: 'rgb(235,239,242)',
@@ -107,7 +106,8 @@ class PostForm extends Component {
             <div className="btn-group" role="group">
               <button
                 className="btn btn-default"
-                type="submit"
+                type="button"
+                onClick={() => this.submit()}
               >
                 {type === FormTypes.CREATE ? '發佈' : '更新'}
               </button>
@@ -172,7 +172,7 @@ class PostForm extends Component {
             <BlogEditor ref="blogEditor" />
           </Container>
         </Section>
-      </Form>
+      </div>
     );
   }
 };
@@ -185,7 +185,6 @@ PostForm.contextTypes = {
 PostForm.propTypes = {
   type: PropTypes.oneOf([FormTypes.CREATE, FormTypes.UPDATE]).isRequired,
   fields: PropTypes.object.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
   routerParams: PropTypes.object,
 };
 
