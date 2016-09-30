@@ -60,8 +60,8 @@ let Post = new mongoose.Schema({
 
 // ref: <https://gist.github.com/aheckmann/3658511>
 Post.path('title').set(function(value) {
-  this.slug = slugify(value);
-  if (this.isNew) {
+  if (!this.slug) {
+    this.slug = slugify(value);
     this._id = this.slug;
   }
   return value;
