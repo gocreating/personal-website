@@ -5,12 +5,16 @@ import Post from '../models/Post';
 
 export default {
   list(req, res) {
-    Post.find({}, handleDbError(res)((posts) => {
-      res.json({
-        posts: posts,
-        isError: false,
-      });
-    }));
+    Post
+      .find({})
+      .select('author slug title createdAt updatedAt abstract')
+      .sort('-createdAt')
+      .exec(handleDbError(res)((posts) => {
+        res.json({
+          posts: posts,
+          isError: false,
+        });
+      }));
   },
 
   create(req, res) {
