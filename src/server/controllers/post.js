@@ -1,3 +1,4 @@
+import assign from 'object-assign';
 import { handleDbError } from '../decorators/handleError';
 import filterAttribute from '../utils/filterAttribute';
 import Post from '../models/Post';
@@ -37,16 +38,20 @@ export default {
   },
 
   update(req, res) {
-    let post = filterAttribute(req.body, [
+    let modifiedPost = filterAttribute(req.body, [
       'title',
       'rawContent',
     ]);
-    Post.update({ _id: req.params.slug }, post, handleDbError(res)((raw) => {
-      res.json({
-        originAttributes: req.body,
-        updatedAttributes: post,
-        isError: false,
-      });
+
+    Post.findById(req.params.slug, handleDbError(res)((post) => {
+      post = assign(post, modifiedPost);
+      post.save(handleDbError(res)(() => {
+        res.json({
+          originAttributes: req.body,
+          updatedAttributes: post,
+          isError: false,
+        });
+      }));
     }));
   },
 
