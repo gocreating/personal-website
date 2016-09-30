@@ -46,8 +46,20 @@ class PostForm extends Component {
     }
   }
 
+  isFormDirty() {
+    let { dirty } = this.props;
+    let { store } = this.context;
+    let postForm = store.getState().form.post;
+
+    return dirty || (
+      postForm &&
+      postForm.content &&
+      postForm.content.touched
+    );
+  }
+
   _submit() {
-    let { type, routerParams } = this.props;
+    let { type, routerParams, untouchAll } = this.props;
 
     if (type === FormTypes.CREATE) {
       let { apiEngine, form } = this.context.store.getState();
@@ -63,6 +75,7 @@ class PostForm extends Component {
           throw err;
         })
         .then((json) => {
+          untouchAll();
           this.context.router.push(`/blog/post/${json.post.slug}`);
         });
     } else if (type === FormTypes.UPDATE) {
@@ -73,7 +86,7 @@ class PostForm extends Component {
   }
 
   _save() {
-    let { routerParams } = this.props;
+    let { routerParams, untouchAll } = this.props;
     let { apiEngine, form } = this.context.store.getState();
     let rawContent = this.refs.blogEditor.getRawContent();
 
@@ -86,6 +99,9 @@ class PostForm extends Component {
       .catch((err) => {
         alert('Update post fail');
         throw err;
+      })
+      .then((json) => {
+        untouchAll();
       });
   }
 
@@ -99,6 +115,7 @@ class PostForm extends Component {
       routerParams,
       fields: { title },
     } = this.props;
+    let isFormDirty = this.isFormDirty();
 
     return (
       <div>
@@ -112,6 +129,7 @@ class PostForm extends Component {
               <button
                 className="btn btn-default"
                 type="button"
+                disabled={!isFormDirty}
                 onClick={() => this.submit()}
               >
                 {type === FormTypes.CREATE ? '發佈' : '更新'}
@@ -120,6 +138,7 @@ class PostForm extends Component {
                 <button
                   className="btn btn-default"
                   type="button"
+                  disabled={!isFormDirty}
                   onClick={() => this.save()}
                 >
                   儲存
