@@ -12,4 +12,7 @@ export default {
   LOGOUT_USER: 'LOGOUT_USER',
 
   UPDATE_LOCALE: 'UPDATE_LOCALE',
+
+  SET_POSTS: 'SET_POSTS',
+  SET_POST: 'SET_POST',
 };
