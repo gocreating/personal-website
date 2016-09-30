@@ -1,5 +1,7 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import redraft from 'redraft';
+import { setPost } from '../../../../actions/blogActions';
 import blogAPI from '../../../../api/blog';
 import PageLayout from '../../../layouts/PageLayout';
 import Container from '../../../main/Container';
@@ -11,31 +13,28 @@ class ShowPage extends Component {
     super(props);
     this.handleEditBtnClick = this._handleEditBtnClick.bind(this);
     this.handleRemoveBtnClick = this._handleRemoveBtnClick.bind(this);
-    this.state = {
-      post: {
-        rawContent: {
-          blocks: [],
-          entityMap: {},
-        },
-      },
-    };
   }
 
   componentDidMount() {
-    blogAPI(this.context.store.getState().apiEngine)
-      .post()
-      .read(this.props.params.slug)
-      .catch((err) => {
-        alert('Read post error');
-        throw err;
-      })
-      .then((json) => {
-        if (json.post) {
-          this.setState({
-            post: json.post,
-          });
-        }
-      });
+    let { apiEngine, params, dispatch } = this.props;
+    let post = this.getPost();
+
+    if (!post || (post && !post.isFetched)) {
+      blogAPI(apiEngine)
+        .post()
+        .read(params.slug)
+        .catch((err) => {
+          alert('Read post error');
+          throw err;
+        })
+        .then((json) => dispatch(setPost(json.post)));
+    }
+  }
+
+  getPost() {
+    let { posts, params } = this.props;
+    let post = posts.find((post) => post.slug === params.slug);
+    return post;
   }
 
   _handleEditBtnClick() {
@@ -43,9 +42,11 @@ class ShowPage extends Component {
   }
 
   _handleRemoveBtnClick() {
-    blogAPI(this.context.store.getState().apiEngine)
+    let { apiEngine, params } = this.props;
+
+    blogAPI(apiEngine)
       .post()
-      .remove(this.props.params.slug)
+      .remove(params.slug)
       .catch((err) => {
         alert('Remove post error');
         throw err;
@@ -56,10 +57,10 @@ class ShowPage extends Component {
   }
 
   render() {
-    let { post } = this.state;
-    let { token } = this.context.store.getState().cookie;
+    let { cookie: { token } } = this.props;
     let isAuth = !!token;
-    let rendered = redraft(post.rawContent, renderer);
+    let post = this.getPost();
+    let rendered = post && redraft(post.rawContent, renderer);
 
     return (
       <PageLayout>
@@ -91,9 +92,11 @@ class ShowPage extends Component {
           </Section>
         )}
         <Container>
-          <div style={{fontSize: 80, margin: '50px 0', textAlign: 'center'}}>
-            {post.title}
-          </div>
+          {post && (
+            <div style={{fontSize: 80, margin: '50px 0', textAlign: 'center'}}>
+              {post.title}
+            </div>
+          )}
           {rendered}
           <div style={{height: 100}} />
         </Container>
@@ -103,8 +106,11 @@ class ShowPage extends Component {
 }
 
 ShowPage.contextTypes = {
-  store: PropTypes.object.isRequired,
   router: PropTypes.any.isRequired,
 };
 
-export default ShowPage;
+export default connect(state => ({
+  apiEngine: state.apiEngine,
+  cookie: state.cookie,
+  posts: state.blog.posts,
+}))(ShowPage);

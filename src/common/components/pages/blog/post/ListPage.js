@@ -1,36 +1,29 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router';
+import { setPosts } from '../../../../actions/blogActions';
 import PageLayout from '../../../layouts/PageLayout';
 import Container from '../../../main/Container';
 import blogAPI from '../../../../api/blog';
 
 class ListPage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      posts: [],
-    };
-  }
-
   componentDidMount() {
-    if (!this.state.posts.length) {
-      blogAPI(this.context.store.getState().apiEngine)
+    let { blog: { isPostsFetched }, apiEngine, dispatch } = this.props;
+
+    if (!isPostsFetched) {
+      blogAPI(apiEngine)
         .post()
         .list()
         .catch((err) => {
           alert('List posts error');
           throw err;
         })
-        .then((json) => {
-          this.setState({
-            posts: json.posts,
-          });
-        });
+        .then((json) => dispatch(setPosts(json.posts)));
     }
   }
 
   render() {
-    let { posts } = this.state;
+    let { blog: { posts } } = this.props;
 
     return (
       <PageLayout>
@@ -58,8 +51,7 @@ class ListPage extends Component {
   }
 }
 
-ListPage.contextTypes = {
-  store: PropTypes.object.isRequired,
-};
-
-export default ListPage;
+export default connect(state => ({
+  apiEngine: state.apiEngine,
+  blog: state.blog,
+}))(ListPage);
