@@ -44,16 +44,18 @@ class ShowPage extends Component {
   _handleRemoveBtnClick() {
     let { apiEngine, params } = this.props;
 
-    blogAPI(apiEngine)
-      .post()
-      .remove(params.slug)
-      .catch((err) => {
-        alert('Remove post error');
-        throw err;
-      })
-      .then((json) => {
-        this.context.router.push('/blog/post');
-      });
+    if (confirm('確定刪除?')) {
+      blogAPI(apiEngine)
+        .post()
+        .remove(params.slug)
+        .catch((err) => {
+          alert('Remove post error');
+          throw err;
+        })
+        .then((json) => {
+          this.context.router.push('/blog/post');
+        });
+    }
   }
 
   render() {
