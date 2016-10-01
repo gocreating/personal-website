@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import redraft from 'redraft';
+import ReactDisqusThread from 'react-disqus-thread';
 import { setPost } from '../../../../actions/blogActions';
 import blogAPI from '../../../../api/blog';
 import PageLayout from '../../../layouts/PageLayout';
@@ -64,6 +65,9 @@ class ShowPage extends Component {
     let isAuth = !!token;
     let post = this.getPost();
     let rendered = post && redraft(post.rawContent, renderer);
+    let gap = (
+      <div style={{height: 100}} />
+    );
 
     return (
       <PageLayout>
@@ -107,7 +111,15 @@ class ShowPage extends Component {
             />
           )}
           {rendered}
-          <div style={{height: 100}} />
+          {gap}
+          {post && (
+            <ReactDisqusThread
+              shortname="gocreating-personal-website"
+              identifier={post.slug}
+              title={post.title}
+            />
+          )}
+          {gap}
         </Container>
       </PageLayout>
     );
