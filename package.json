@@ -117,6 +117,7 @@
     "react-redux": "^4.4.5",
     "react-router": "^2.3.0",
     "react-router-active-component": "^4.0.0-rc.0",
+    "react-share": "^1.10.0",
     "redraft": "^0.4.1",
     "redux": "^3.5.2",
     "redux-form": "^5.2.3",
