@@ -5,16 +5,21 @@ import Post from '../models/Post';
 
 export default {
   list(req, res) {
-    Post
-      .find({})
-      .select('author slug title createdAt updatedAt abstract')
-      .sort('-createdAt')
-      .exec(handleDbError(res)((posts) => {
-        res.json({
-          posts: posts,
-          isError: false,
-        });
-      }));
+    Post.paginate({ page: req.query.page }, handleDbError(res)((page) => {
+      Post
+        .find({})
+        .select('author slug title createdAt updatedAt abstract')
+        .sort({ createdAt: 'desc' })
+        .limit(page.limit)
+        .skip(page.skip)
+        .exec(handleDbError(res)((posts) => {
+          res.json({
+            posts: posts,
+            page: page,
+            isError: false,
+          });
+        }));
+    }));
   },
 
   create(req, res) {

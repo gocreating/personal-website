@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+import paginatePlugin from './plugins/paginate';
 
 function slugify(v) {
   return (v || '').replace(/\s+/g, '-');
@@ -57,6 +58,8 @@ let Post = new mongoose.Schema({
   // Otherwise, `convertFromRaw` will go wrong
   minimize: false,
 });
+
+Post.plugin(paginatePlugin);
 
 // ref: <https://gist.github.com/aheckmann/3658511>
 Post.path('title').set(function(value) {
