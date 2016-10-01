@@ -6,4 +6,8 @@ export default {
   'nav.language': 'Language',
   'nav.blog.new': 'New Post',
   'nav.user.logout': 'Logout',
+  'page.first': 'First Page',
+  'page.prev': 'Previous',
+  'page.next': 'Next',
+  'page.last': 'Last Page',
 };
