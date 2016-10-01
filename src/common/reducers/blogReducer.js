@@ -3,6 +3,7 @@ import actionTypes from '../constants/actionTypes';
 let initState = {
   isPostsFetched: false,
   posts: [],
+  page: {},
 };
 
 export default (state = initState, action) => {
@@ -48,6 +49,12 @@ export default (state = initState, action) => {
         posts: [
           action.post,
         ],
+      };
+    }
+    case actionTypes.SET_PAGE: {
+      return {
+        ...state,
+        page: action.page,
       };
     }
     default: {

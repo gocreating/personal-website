@@ -2,34 +2,50 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import cx from 'classnames';
-import { setPosts } from '../../../../actions/blogActions';
+import { setPosts, setPage, setColumn } from '../../../../actions/blogActions';
 import PageLayout from '../../../layouts/PageLayout';
 import Section from '../../../Section';
 import Container from '../../../main/Container';
 import Time from '../../../Time';
+import Pagination from '../../../Pagination';
 import blogAPI from '../../../../api/blog';
 
+function propsToPage(props) {
+  return props.location.query.page || 1;
+}
+
 class ListPage extends Component {
-  constructor() {
-    super();
-    this.state = {
-      column: 1,
-    };
+  componentDidMount() {
+    if (!this.props.cookie.column) {
+      this.props.dispatch(setColumn(1));
+    }
+    if (!this.props.blog.isPostsFetched) {
+      this.fetchPosts();
+    }
   }
 
-  componentDidMount() {
-    let { blog: { isPostsFetched }, apiEngine, dispatch } = this.props;
-
-    if (!isPostsFetched) {
-      blogAPI(apiEngine)
-        .post()
-        .list()
-        .catch((err) => {
-          alert('List posts error');
-          throw err;
-        })
-        .then((json) => dispatch(setPosts(json.posts)));
+  componentDidUpdate(prevProps) {
+    if (propsToPage(prevProps) !== propsToPage(this.props)) {
+      this.fetchPosts();
     }
+  }
+
+  fetchPosts() {
+    let { apiEngine, dispatch } = this.props;
+    let page = propsToPage(this.props);
+
+    blogAPI(apiEngine)
+      .post()
+      .list({ page })
+      .catch((err) => {
+        alert('List posts error');
+        throw err;
+      })
+      .then((json) => {
+        dispatch(setPosts(json.posts));
+        dispatch(setPage(json.page));
+        document.body.scrollTop = 0;
+      });
   }
 
   abstractToComponents(abstract) {
@@ -41,7 +57,8 @@ class ListPage extends Component {
   }
 
   renderToolbar() {
-    let { column } = this.state;
+    let { dispatch } = this.props;
+    let column = Number(this.props.cookie.column);
     let cxBtnOfColumn = (c) => (
       cx('btn btn-default', {active: c === column})
     );
@@ -51,21 +68,21 @@ class ListPage extends Component {
         <button
           type="button"
           className={cxBtnOfColumn(1)}
-          onClick={() => this.setState({ column: 1 })}
+          onClick={() => dispatch(setColumn(1))}
         >
           <i className="fa fa-th-list" aria-hidden="true" />
         </button>
         <button
           type="button"
           className={cxBtnOfColumn(2)}
-          onClick={() => this.setState({ column: 2 })}
+          onClick={() => dispatch(setColumn(2))}
         >
           <i className="fa fa-th-large" aria-hidden="true" />
         </button>
         <button
           type="button"
           className={cxBtnOfColumn(3)}
-          onClick={() => this.setState({ column: 3 })}
+          onClick={() => dispatch(setColumn(3))}
         >
           <i className="fa fa-th" aria-hidden="true" />
         </button>
@@ -74,8 +91,10 @@ class ListPage extends Component {
   }
 
   render() {
-    let { blog: { posts } } = this.props;
-    let { column } = this.state;
+    let {
+      blog: { posts, page },
+      cookie: { column },
+    } = this.props;
 
     return (
       <PageLayout>
@@ -116,6 +135,9 @@ class ListPage extends Component {
               ))}
             </div>
           </Container>
+          <Container>
+            <Pagination base="/blog/post" page={page} simple />
+          </Container>
         </Section>
       </PageLayout>
     );
@@ -124,5 +146,6 @@ class ListPage extends Component {
 
 export default connect(state => ({
   apiEngine: state.apiEngine,
+  cookie: state.cookie,
   blog: state.blog,
 }))(ListPage);

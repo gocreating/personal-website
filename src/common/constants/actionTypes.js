@@ -15,4 +15,5 @@ export default {
 
   SET_POSTS: 'SET_POSTS',
   SET_POST: 'SET_POST',
+  SET_PAGE: 'SET_PAGE',
 };
