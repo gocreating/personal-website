@@ -6,6 +6,7 @@ import blogAPI from '../../../../api/blog';
 import PageLayout from '../../../layouts/PageLayout';
 import Container from '../../../main/Container';
 import Section from '../../../Section';
+import SocialPanel from '../../../SocialPanel';
 import renderer from '../../../BlogEditor/renderer';
 
 class ShowPage extends Component {
@@ -98,6 +99,12 @@ class ShowPage extends Component {
             <div style={{fontSize: 80, margin: '50px 0', textAlign: 'center'}}>
               {post.title}
             </div>
+          )}
+          {post && (
+            <SocialPanel
+              className="hidden-xs"
+              title={post.title}
+            />
           )}
           {rendered}
           <div style={{height: 100}} />
