@@ -1,20 +1,21 @@
+import Errors from '../../common/constants/Errors';
 import todoAPI from '../../common/api/todo';
 import wrapTimeout from '../decorators/wrapTimeout';
 import { loginUser } from '../../common/actions/userActions';
 import { updateLocale } from '../../common/actions/intlActions';
-import { setTodo } from '../../common/actions/todoActions';
+import { setTodos } from '../../common/actions/todoActions';
 
 export default {
   user: (req, res, next) => {
-    let { cookie } = req.store.getState();
+    let { cookies } = req.store.getState();
     req.store.dispatch(loginUser({
-      token: cookie.token,
-      data: cookie.user,
+      token: cookies.token,
+      data: cookies.user,
     }));
     next();
   },
   intl: wrapTimeout(3000)((req, res, next) => {
-    const cookieLocale = req.store.getState().cookie.locale;
+    const cookieLocale = req.store.getState().cookies.locale;
     let lang;
     if (cookieLocale) {
       lang = cookieLocale;
@@ -25,18 +26,24 @@ export default {
       .dispatch(updateLocale(lang))
       .then(() => {
         next();
-      }, (err) => {
-        throw err;
+      }, () => {
+        res.pushError(Errors.STATE_PRE_FETCHING_FAIL, {
+          detail: 'Cannot setup locale',
+        });
+        next();
       });
   }),
   todo: wrapTimeout(3000)((req, res, next) => {
     todoAPI(req.store.getState().apiEngine)
-      .list()
-      .catch((err) => {
-        throw err;
+      .list({ page: req.query.page || 1 })
+      .catch(() => {
+        res.pushError(Errors.STATE_PRE_FETCHING_FAIL, {
+          detail: 'Cannot list todos',
+        });
+        next();
       })
       .then((json) => {
-        req.store.dispatch(setTodo(json.todos));
+        req.store.dispatch(setTodos(json));
         next();
       });
   }),

@@ -1,6 +1,5 @@
 import cookie from 'cookie';
-import actionTypes from '../constants/actionTypes';
-import removeByKey from '../utils/removeByKey';
+import ActionTypes from '../constants/ActionTypes';
 
 let initCookies = {};
 if (process.env.BROWSER) {
@@ -11,9 +10,9 @@ if (process.env.BROWSER) {
 
 export default (state = initCookies, action) => {
   switch (action.type) {
-    case actionTypes.SET_COOKIE: {
+    case ActionTypes.SET_COOKIE: {
       let cookiePair = {};
-      let value = '';
+      let value = action.cookie.value;
       if (typeof action.cookie.value === 'string') {
         value = action.cookie.value;
       } else if (typeof action.cookie.value === 'object') {
@@ -24,9 +23,6 @@ export default (state = initCookies, action) => {
         ...state,
         ...cookiePair,
       };
-    }
-    case actionTypes.REMOVE_COOKIE: {
-      return removeByKey(state, action.name);
     }
     default: {
       return state;

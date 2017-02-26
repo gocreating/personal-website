@@ -15,6 +15,16 @@ const appPromise = new Promise((resolve, reject) => {
   const app = express();
   app.set('env', env);
 
+  // error handler for the whole app process
+  process.on('uncaughtException', (err) => {
+    console.log('uncaughtException', err);
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', (reason, p) => {
+    throw reason;
+  });
+
   // initialize firebase
   if (configs.firebase && clientConfigs.firebase) {
     let firebase = require('firebase');
@@ -22,9 +32,13 @@ const appPromise = new Promise((resolve, reject) => {
       serviceAccount: configs.firebase,
       databaseURL: clientConfigs.firebase.databaseURL,
     });
-    console.log('[Service] [Firebase]\tenabled');
+    if (env !== 'test') {
+      console.log('[Service] [Firebase]\tenabled');
+    }
   } else {
-    console.log('[Service] [Firebase]\tdisabled');
+    if (env !== 'test') {
+      console.log('[Service] [Firebase]\tdisabled');
+    }
   }
 
   // connect to mongolab
@@ -33,13 +47,26 @@ const appPromise = new Promise((resolve, reject) => {
       if (err) {
         throw err;
       }
-      console.log('[Service] [Mongo]\tenabled');
+      if (env !== 'test') {
+        console.log('[Service] [Mongo]\tenabled');
+      }
       middlewares({ app });
       routes({ app });
+      // error handler for the current request
+      app.use((err, req, res, next) => {
+        console.error(err.stack);
+        if (env !== 'production') {
+          res.status(500).send(`<pre>${err.stack}</pre>`);
+        } else {
+          res.status(500).send('Service Unavailable');
+        }
+      });
       return resolve(app);
     });
   } else {
-    console.log('[Service] [Mongo]\tdisabled');
+    if (env !== 'test') {
+      console.log('[Service] [Mongo]\tdisabled');
+    }
     return reject(new Error('MongoDB URI is required'));
   }
 });

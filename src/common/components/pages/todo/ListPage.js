@@ -1,35 +1,130 @@
 import React, { Component } from 'react';
-import PageLayout from '../../layouts/PageLayout';
 import { connect } from 'react-redux';
-import PageHeader from '../../main/PageHeader';
-import TodoItem from '../../TodoItem';
+import { push } from 'react-router-redux';
+import PageHeader from 'react-bootstrap/lib/PageHeader';
+import Resources from '../../../constants/Resources';
+import todoAPI from '../../../api/todo';
+import { pushErrors } from '../../../actions/errorActions';
+import { setCrrentPage } from '../../../actions/pageActions';
 import {
-  setTodo,
+  setTodos,
   addTodo,
   removeTodo,
 } from '../../../actions/todoActions';
-import todoAPI from '../../../api/todo';
+import PageLayout from '../../layouts/PageLayout';
+import Pager from '../../utils/BsPager';
 
-@connect(state => state)
-export default class ListPage extends Component {
-  constructor(props) {
-    super(props);
-    this._handleAddClick = this._handleAddClick.bind(this);
+class TodoItem extends Component {
+  constructor() {
+    super();
+    this.state = {
+      isEditable: false,
+      inputValue: '',
+    };
+  }
+
+  renderInput() {
+    let { inputValue } = this.state;
+
+    return (
+      <input
+        type="text"
+        value={inputValue}
+        onChange={(e) => this.setState({
+          inputValue: e.target.value,
+        })}
+      />
+    );
+  }
+
+  renderControlButtons() {
+    let { text, onSaveClick } = this.props;
+    let { isEditable, inputValue } = this.state;
+
+    return isEditable ? (
+      <span>
+        <button
+          onClick={() => (
+            onSaveClick(inputValue)
+              .then(() => this.setState({ isEditable: false }))
+          )}
+        >
+          Save
+        </button>
+        <button onClick={() => this.setState({ isEditable: false })}>
+          Cancel
+        </button>
+      </span>
+    ) : (
+      <span>
+        <button
+          onClick={() => this.setState({ isEditable: true, inputValue: text })}
+        >
+          Edit
+        </button>
+      </span>
+    );
+  }
+
+  render() {
+    let { onRemoveClick, text } = this.props;
+    let { isEditable } = this.state;
+
+    return (
+      <li>
+        {text}
+        {isEditable && this.renderInput()}
+        {this.renderControlButtons()}
+        <button onClick={onRemoveClick}>x</button>
+      </li>
+    );
+  }
+}
+
+class ListPage extends Component {
+  constructor() {
+    super();
+    this.handlePageChange = this._handlePageChange.bind(this);
+    this.fetchTodos = this._fetchTodos.bind(this);
+    this.handleAddClick = this._handleAddClick.bind(this);
   }
 
   componentDidMount() {
-    const { dispatch, apiEngine } = this.props;
-    if (this.props.todos.length === 0) {
-      todoAPI(apiEngine)
-        .list()
-        .catch((err) => {
-          alert('List todos fail');
-          throw err;
-        })
-        .then((json) => {
-          dispatch(setTodo(json.todos));
-        });
+    let { location } = this.props;
+
+    this.fetchTodos(location.query.page || 1);
+  }
+
+  componentDidUpdate(prevProps) {
+    let { page, todos } = this.props;
+
+    if (todos.length === 0 && prevProps.page.current !== page.current) {
+      this.fetchTodos(page.current);
     }
+  }
+
+  _handlePageChange(pageId) {
+    let { dispatch } = this.props;
+
+    dispatch(setCrrentPage(Resources.TODO, pageId));
+  }
+
+  _fetchTodos(page) {
+    let { dispatch, apiEngine, location } = this.props;
+
+    todoAPI(apiEngine)
+      .list({ page })
+      .catch((err) => {
+        dispatch(pushErrors(err));
+        throw err;
+      })
+      .then((json) => {
+        dispatch(setTodos(json));
+        dispatch(push({
+          pathname: location.pathname,
+          query: { page: json.page.current },
+        }));
+      });
   }
 
   _handleAddClick() {
@@ -38,7 +133,7 @@ export default class ListPage extends Component {
     todoAPI(apiEngine)
       .create({ text })
       .catch((err) => {
-        alert('Create todo fail');
+        dispatch(pushErrors(err));
         throw err;
       })
       .then((json) => {
@@ -47,12 +142,26 @@ export default class ListPage extends Component {
       });
   }
 
-  _handleRemoveClick(id) {
+  handleSaveClick(id, newText) {
+    let { dispatch, apiEngine } = this.props;
+
+    return todoAPI(apiEngine)
+      .update(id, { text: newText })
+      .catch((err) => {
+        dispatch(pushErrors(err));
+        throw err;
+      })
+      .then((json) => {
+        this.fetchTodos();
+      });
+  }
+
+  handleRemoveClick(id) {
     const { dispatch, apiEngine } = this.props;
     todoAPI(apiEngine)
       .remove(id)
       .catch((err) => {
-        alert('Remove todo fail');
+        dispatch(pushErrors(err));
         throw err;
       })
       .then((json) => {
@@ -61,19 +170,52 @@ export default class ListPage extends Component {
   }
 
   render() {
+    let { page } = this.props;
+
     return (
       <PageLayout>
-        <PageHeader title="Todo List" />
-        <input type="text" ref="todotext" />
-        <button onClick={this._handleAddClick}>Add Todo</button>
+        <PageHeader>Todo List ({`${page.current} / ${page.total}`})</PageHeader>
+        <input
+          disabled={page.current !== 1}
+          type="text"
+          ref="todotext"
+        />
+        <button
+          disabled={page.current !== 1}
+          onClick={this.handleAddClick}
+        >
+          Add Todo
+        </button>
+        {page.current !== 1 && (
+          <div>
+            The input box is only available for page 1
+          </div>
+        )}
         <ul>
-          {this.props.todos.map((todo, index) =>
+          {this.props.todos.map((todo) =>
             <TodoItem
-              key={index}
-              onRemoveClick={this._handleRemoveClick.bind(this, todo._id)}
+              key={todo._id}
+              onRemoveClick={this.handleRemoveClick.bind(this, todo._id)}
+              onSaveClick={this.handleSaveClick.bind(this, todo._id)}
               text={todo.text} />)}
         </ul>
+        <Pager
+          page={page}
+          onPageChange={this.handlePageChange}
+        />
       </PageLayout>
     );
   }
 };
+
+export default connect(({ apiEngine, pagination, entity }) => {
+  let { page } = pagination.todos;
+  let todoPages = pagination.todos.pages[page.current] || { ids: [] };
+  let todos = todoPages.ids.map(id => entity.todos[id]);
+
+  return {
+    apiEngine,
+    todos,
+    page,
+  };
+})(ListPage);
