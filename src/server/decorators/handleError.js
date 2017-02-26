@@ -1,37 +1,65 @@
-// error types
-const ErrorTypes = {
-  DB: 'Db',
-};
+import ErrorTypes from '../constants/ErrorTypes';
+import Errors from '../../common/constants/Errors';
 
-const handleError = (res, errorType) => (fn) => (err, ...result) => {
+let getErrorHandler = (errorTypes) => (res) => (fn) => (err, ...result) => {
   if (err) {
-    let errorResponse = {
-      isError: true,
-      status: 400,
-      errors: [],
-    };
-    if (errorType === ErrorTypes.DB) {
-      if (err.errors !== undefined) {
-        errorResponse.errors.push({
-          name: err.name,
-          message: err.message,
-          errors: err.errors,
-        });
-      } else {
-        errorResponse.errors.push(err);
-      }
-    } else {
-      errorResponse.errors.push({
-        name: 'Unknown',
-        message: 'unknown exception',
-      });
+    if (!Array.isArray(errorTypes)) {
+      errorTypes = [errorTypes];
     }
-    return res.json(errorResponse);
+    errorTypes.forEach((errorType) => {
+      switch (errorType) {
+        case ErrorTypes.ODM_OPERATION: {
+          if (err.name === 'ValidationError') {
+            res.pushError(Errors.ODM_VALIDATION, err);
+            return res.errors();
+          }
+          if (err.name === 'MongooseError') {
+            res.pushError(Errors.ODM_OPERATION_FAIL, err);
+            return res.errors();
+          }
+          break;
+        }
+        case ErrorTypes.JSON_WEB_TOKEN: {
+          // ref:
+          //   - <https://github.com/auth0/node-jsonwebtoken#errors--codes>
+          if (err.name === 'JsonWebTokenError') {
+            res.pushError(Errors.BAD_TOKEN, err);
+            return res.errors();
+          } else if (err.name === 'TokenExpiredError') {
+            res.pushError(Errors.TOKEN_EXPIRATION, err);
+            return res.errors();
+          }
+          break;
+        }
+        case ErrorTypes.PASSPORT: {
+          if (err.message === 'No auth token') {
+            res.pushError(Errors.USER_UNAUTHORIZED, err);
+            return res.errors();
+          }
+          break;
+        }
+        default: {
+          res.pushError(Errors.UNKNOWN_EXCEPTION, err);
+          return res.errors();
+        }
+      }
+    });
+  } else {
+    fn(...result);
   }
-  fn(...result);
 };
 
-const handleDbError = (res) => handleError(res, ErrorTypes.DB);
+let handleError = getErrorHandler(null);
+let handleDbError = getErrorHandler(ErrorTypes.ODM_OPERATION);
+let handleJwtError = getErrorHandler(ErrorTypes.JSON_WEB_TOKEN);
+let handlePassportError = getErrorHandler([
+  ErrorTypes.JSON_WEB_TOKEN,
+  ErrorTypes.PASSPORT,
+]);
 
+export {
+  handleDbError,
+  handleJwtError,
+  handlePassportError,
+};
 export default handleError;
-export { ErrorTypes, handleDbError };

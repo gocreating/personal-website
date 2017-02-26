@@ -1,16 +1,22 @@
 import { combineReducers } from 'redux';
-import cookie from './cookieReducer';
+import routing from './routerReducer';
+import cookies from './cookieReducer';
+import errors from './errorReducer';
 import apiEngine from './apiEngineReducer';
-import todos from './todoReducer';
 import form from './formReducer';
 import intl from './intlReducer';
+import entity from './entityReducer';
+import pagination from './paginationReducer';
 
 const rootReducer = combineReducers({
-  cookie,
+  routing,
+  cookies,
+  errors,
   apiEngine,
-  todos,
-  form,
+  form, // must mount as `form` from redux-form's docs
   intl,
+  entity,
+  pagination,
 });
 
 export default rootReducer;

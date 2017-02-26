@@ -1,8 +1,7 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import Head from '../Head';
+import Head from '../widgets/Head';
 
-const AppLayout = ({ cookie, children }) => (
+const AppLayout = ({ children }) => (
   <div>
     <Head
       title="Go Creating"
@@ -24,4 +23,4 @@ const AppLayout = ({ cookie, children }) => (
   </div>
 );
 
-export default connect(state => state)(AppLayout);
+export default AppLayout;

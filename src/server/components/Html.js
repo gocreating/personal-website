@@ -1,3 +1,4 @@
+import serialize from 'serialize-javascript';
 import React, { PropTypes } from 'react';
 import { renderToString } from 'react-dom/server';
 
@@ -20,7 +21,12 @@ const Html = ({ assets, children, initialState }) => (
       <link
         rel="stylesheet"
         type="text/css"
-        href="/css/theme.css"
+        href="https://bootswatch.com/flatly/bootstrap.min.css"
+      />
+      <link
+        rel="stylesheet"
+        type="text/css"
+        href="/css/main.css"
       />
       <script
         src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"
@@ -44,7 +50,9 @@ const Html = ({ assets, children, initialState }) => (
 
       <script
         dangerouslySetInnerHTML={{
-          __html: `window.__INITIAL_STATE__=${JSON.stringify(initialState)};`,
+          __html: `window.__INITIAL_STATE__=${
+            serialize(initialState, { isJSON: true })
+          };`,
         }}
       />
       <script src="https://code.jquery.com/jquery-2.2.3.min.js" />

@@ -6,6 +6,7 @@ node_modules
 *.pem
 *.ppk
 configs/**/credential.*
+!configs/**/credential.tmpl.*
 
 # Log
 *.log
@@ -13,8 +14,8 @@ configs/**/credential.*
 # Generated files
 /build
 /.deploy
-/src/public/uploads
-/src/public/user
+/src/public/tmp
+/src/public/users
 /src/native/styles/index.js
 my-release-key.keystore
 
