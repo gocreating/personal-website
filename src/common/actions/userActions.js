@@ -1,4 +1,9 @@
+import { normalize, arrayOf } from 'normalizr';
+import { userSchema } from '../schemas';
+import Resources from '../constants/Resources';
 import { setCookies, removeCookie } from './cookieActions';
+import { setEntities } from './entityActions';
+import { setPages } from './pageActions';
 
 export const loginUser = ({ token, data }) => {
   return (dispatch) => {
@@ -10,8 +15,15 @@ export const loginUser = ({ token, data }) => {
 };
 
 export const logoutUser = () => {
-  return (dispatch) => {
-    dispatch(removeCookie('token'));
-    dispatch(removeCookie('user'));
-  };
+  return (dispatch) => Promise.all([
+    dispatch(removeCookie('token')),
+    dispatch(removeCookie('user')),
+  ]);
+};
+
+export const setUsers = (res) => (dispatch, getState) => {
+  let normalized = normalize(res.users, arrayOf(userSchema));
+
+  dispatch(setEntities(normalized));
+  dispatch(setPages(Resources.USER, res.page, normalized.result));
 };

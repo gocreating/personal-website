@@ -3,7 +3,7 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { match, RouterContext } from 'react-router';
 import { Provider } from 'react-redux';
-import LocaleProvider from '../../common/components/LocaleProvider';
+import LocaleProvider from '../../common/components/utils/LocaleProvider';
 import Html from '../components/Html';
 import getRoutes from '../../common/routes';
 
@@ -15,7 +15,8 @@ export default {
     let routes = getRoutes(req.store);
     match({
       routes,
-      location: req.url,
+      // we use `history: req.history` instead of `location: req.url` to deal with redirections
+      history: req.history,
     }, (error, redirectLocation, renderProps) => {
       if (error) {
         return res.status(500).send(error.message);

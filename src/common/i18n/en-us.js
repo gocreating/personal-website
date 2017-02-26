@@ -4,4 +4,13 @@ export default {
   'nav.blog': 'Blog',
   'nav.resume': 'Resume',
   'nav.language': 'Language',
+  'nav.user': 'User',
+  'nav.user.login': 'Login',
+  'nav.user.register': 'Register',
+  'nav.user.profile': 'Profile',
+  'nav.user.logout': 'Logout',
+  'page.first': 'First Page',
+  'page.prev': 'Previous',
+  'page.next': 'Next',
+  'page.last': 'Last Page',
 };

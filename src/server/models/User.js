@@ -2,6 +2,8 @@ import crypto from 'crypto';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import configs from '../../../configs/project/server';
+import Roles from '../../common/constants/Roles';
+import paginatePlugin from './plugins/paginate';
 
 const hashPassword = (rawPassword = '') => {
   let recursiveLevel = 5;
@@ -15,7 +17,7 @@ const hashPassword = (rawPassword = '') => {
   return rawPassword;
 };
 
-let User = new mongoose.Schema({
+let UserSchema = new mongoose.Schema({
   name: String,
   email: {
     value: {
@@ -26,13 +28,34 @@ let User = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    verifiedAt: Date,
   },
   password: {
     type: String,
-    required: true,
+    // there is no password for a social account
+    required: false,
     set: hashPassword,
   },
-  avatarURL: String,
+  role: {
+    type: String,
+    enum: Object.keys(Roles).map(r => Roles[r]),
+    default: Roles.USER,
+  },
+  avatarURL: {
+    type: String,
+    default: '/img/default-avatar.png',
+  },
+  social: {
+    profile: {
+      facebook: Object,
+      linkedin: Object,
+    },
+  },
+  nonce: {
+    verifyEmail: Number,
+    resetPassword: Number,
+  },
+  lastLoggedInAt: Date,
 }, {
   versionKey: false,
   timestamps: {
@@ -41,27 +64,52 @@ let User = new mongoose.Schema({
   },
 });
 
-User.methods.auth = function(password, cb) {
+UserSchema.plugin(paginatePlugin);
+
+UserSchema.methods.auth = function(password, cb) {
   const isAuthenticated = (this.password === hashPassword(password));
   cb(null, isAuthenticated);
 };
 
-User.methods.toJwtToken = function(cb) {
+UserSchema.methods.toVerifyEmailToken = function(cb) {
+  const user = {
+    _id: this._id,
+    nonce: this.nonce.verifyEmail,
+  };
+  const token = jwt.sign(user, configs.jwt.verifyEmail.secret, {
+    expiresIn: configs.jwt.verifyEmail.expiresIn,
+  });
+  return token;
+};
+
+UserSchema.methods.toResetPasswordToken = function(cb) {
+  const user = {
+    _id: this._id,
+    nonce: this.nonce.resetPassword,
+  };
+  const token = jwt.sign(user, configs.jwt.resetPassword.secret, {
+    expiresIn: configs.jwt.resetPassword.expiresIn,
+  });
+  return token;
+};
+
+UserSchema.methods.toAuthenticationToken = function(cb) {
   const user = {
     _id: this._id,
     name: this.name,
     email: this.email,
   };
-  const token = jwt.sign(user, configs.jwt.secret, {
-    expiresIn: configs.jwt.expiresIn,
+  const token = jwt.sign(user, configs.jwt.authentication.secret, {
+    expiresIn: configs.jwt.authentication.expiresIn,
   });
   return token;
 };
 
-User.methods.toJSON = function() {
+UserSchema.methods.toJSON = function() {
   let obj = this.toObject();
   delete obj.password;
   return obj;
 };
 
-export default mongoose.model('User', User);
+let User = mongoose.model('User', UserSchema);
+export default User;
